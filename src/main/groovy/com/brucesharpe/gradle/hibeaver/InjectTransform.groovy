@@ -120,31 +120,36 @@ public class InjectTransform extends Transform {
         inputs.each { TransformInput input ->
             /**遍历jar*/
             input.jarInputs.each { JarInput jarInput ->
+                String destName = jarInput.file.name;
+                /** 重名名输出文件,因为可能同名,会覆盖*/
+                def hexName = DigestUtils.md5Hex(jarInput.file.absolutePath).substring(0,8);
+                if (destName.endsWith(".jar")) {
+                    destName = destName.substring(0, destName.length() - 4);
+                }
+                /** 获得输出文件*/
+                File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR);
+                Log.info("dest   ${dest.absolutePath}")
                 if ([QualifiedContent.Scope.PROJECT,
                      QualifiedContent.Scope.SUB_PROJECTS].containsAll(jarInput.scopes)) {
-                    String destName = jarInput.name;
-                    /** 重名名输出文件,因为可能同名,会覆盖*/
-                    def hexName = DigestUtils.md5Hex(jarInput.file.absolutePath);
-                    if (destName.endsWith(".jar")) {
-                        destName = destName.substring(0, destName.length() - 4);
-                    }
-                    /** 获得输出文件*/
-                    File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR);
+                    Log.info("需要注入的包${jarInput.file.absolutePath}")
                     def optJar = injectJarFiles(jarInput.file, context.getTemporaryDir())
                     FileUtils.copyFile(optJar, dest);
                     optJar.delete()
+                }else{
+                    Log.info("不需要需要注入的包,copy：${jarInput.file.absolutePath},${dest.absolutePath}")
+                    FileUtils.copyFile(jarInput.file, dest);
                 }
             }
             /**遍历目录*/
             input.directoryInputs.each { DirectoryInput directoryInput ->
+                File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY);
                 if ([QualifiedContent.Scope.PROJECT,
                      QualifiedContent.Scope.SUB_PROJECTS].containsAll(directoryInput.scopes)){
                     /**获得产物的目录*/
-                    File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY);
                     injectAllClassFiles(directoryInput.file);
                     /**处理完后拷到目标文件*/
-                    FileUtils.copyDirectory(directoryInput.file, dest);
                 }
+                FileUtils.copyDirectory(directoryInput.file, dest);
             }
         }
         saveInjectedClasses(flavorAndBuildType);
@@ -199,7 +204,7 @@ public class InjectTransform extends Transform {
         if (classSimpleName.startsWith("R")) {
             shouldInject = false
         }
-        if (classSimpleName.startsWith("BuildConfig")) {
+        if (classSimpleName.contains("BuildConfig")) {
             shouldInject = false
         }
         if (isApplication(className)) {
