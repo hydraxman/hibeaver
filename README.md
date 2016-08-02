@@ -1,3 +1,3 @@
 #HiBeaverPlugin
 
-the practice of new api 'transform' of android gradle plugin
+The practice of new transform api of android gradle plugin.
