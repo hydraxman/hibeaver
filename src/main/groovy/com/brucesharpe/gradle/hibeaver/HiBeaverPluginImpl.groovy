@@ -55,15 +55,12 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     def static registerTransform(Project project) {
         def isApp = project.plugins.hasPlugin("com.android.application")
         if (isApp) {
-//            Log.info "\nregisterTransform"
             def transform = new InjectTransform(project)
             android.registerTransform(transform)
         }
     }
 
     static void applyInject(Project project) {
-        //如果存在hash.txt,解析并存储
-        //建立文件夹
         File myDir = new File(project.buildDir, "HiBeaver")
         if (!myDir.exists()) {
             myDir.mkdir()
