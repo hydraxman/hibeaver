@@ -1,0 +1,86 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+    }
+}
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+[compileJava, compileTestJava, compileGroovy]*.options*.encoding = 'UTF-8'
+sourceCompatibility = 1.6
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile "com.android.tools.build:transform-api:1.5.0"
+    compile "com.android.tools.build:gradle:2.0.0"
+    compile 'org.javassist:javassist:3.18.+'
+    compile "commons-io:commons-io:1.4"
+    compile 'commons-codec:commons-codec:1.6'
+    compile 'asm:asm:3.3.1'
+}
+targetCompatibility = 1.6
+repositories {
+    mavenCentral()
+}
+group = 'com.bryansharp'
+version = '1.1.0'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+            snapshotRepository(url: uri('../snapshotrepo'))
+        }
+    }
+}
+def siteUrl = 'https://github.com/BryanSharp/hibeaver'    // project homepage
+def gitUrl = 'https://github.com/BryanSharp/hibeaver.git' // project git
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'jar'
+                name 'HiBeaver'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'BryanSharp'
+                        name 'BryanSharp'
+                        email 'bsp0911932@163.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = "HiBeaver"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
