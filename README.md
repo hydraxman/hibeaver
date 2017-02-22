@@ -1,3 +1,3 @@
 #HiBeaver
 
-    Easy way to modify your integrated SDK Jar code.
+    Easy way to modify your integrated SDK Jar byte code.
