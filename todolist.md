@@ -7,6 +7,8 @@
 - the function to better and more conveniently display Java byte code, make log output more complete
 - modify directory class input
 - apply class match wildcard
+- modify class: provide function to add methods or constructors
+- create a new class
 
 ##Further Features
 
