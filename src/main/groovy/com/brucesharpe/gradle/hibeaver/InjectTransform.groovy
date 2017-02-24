@@ -105,8 +105,10 @@ public class InjectTransform extends Transform {
                 }
                 /** 获得输出文件*/
                 File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR);
-                Log.info("dest jar  ${dest.absolutePath}")
-                Log.info("需要注入的包${jarInput.file.absolutePath}")
+//                Log.info("dest jar  ${dest.absolutePath}")
+                Log.info("项目包含的jar包：${jarInput.file.absolutePath}")
+                //TODO 先扫描一个jar中的所有entry，如果包含需要修改的项目，再生成新文件
+                //TODO 修改后的jar 单独放置在一处
                 def optJar = injectJarFiles(jarInput.file, context.getTemporaryDir())
                 FileUtils.copyFile(optJar, dest);
             }
