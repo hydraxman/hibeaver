@@ -88,7 +88,6 @@ public class InjectTransform extends Transform {
 
         def paths = [android.bootClasspath.get(0).absolutePath/*, injectClassPath*/]
         paths.addAll(classPaths)
-        InjectUtil.initClassPathList(paths)
         /**遍历输入文件*/
         inputs.each { TransformInput input ->
             /**
