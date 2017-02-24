@@ -162,7 +162,7 @@ public class InjectTransform extends Transform {
                     className = entryName.replace("/", ".").replace(".class", "")
 //                    String classSimpleName = entryName.substring(className.lastIndexOf("."))
                     if (shouldModifyClass(className)) {
-                        if (InjectUtil.modifyClasses(className, null, jarOutputStream, project.hiBeaver.modifyMatchMaps)) {
+                        if (InjectUtil.modifyClasses(className, IOUtils.toByteArray(inputStream), null, jarOutputStream, project.hiBeaver.modifyMatchMaps)) {
                             modified = true;
                         } else {
                             jarOutputStream.write(IOUtils.toByteArray(inputStream));

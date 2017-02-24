@@ -1,13 +1,8 @@
 package com.brucesharpe.gradle.hibeaver.utils
 
-import javassist.ClassPath
-import javassist.ClassPool
-import javassist.CtClass
-import javassist.NotFoundException
 import org.objectweb.asm.*
 
 import java.util.jar.JarOutputStream
-
 /**
  * Created by MrBu(bsp0911932@163.com) on 2016/5/10.
  *
@@ -16,19 +11,18 @@ import java.util.jar.JarOutputStream
  * introduction:
  */
 public class InjectUtil {
-    private static boolean classPathInited = false;
 
     public
-    static boolean modifyClasses(String className, String targetDir, JarOutputStream stream, List<Map<String, Object>> modifyMatchMaps) {
+    static boolean modifyClasses(String className, byte[] classByteCode, String targetDir, JarOutputStream stream, List<Map<String, Object>> modifyMatchMaps) {
         try {
-            CtClass ctClass = ClassPool.getDefault().get(className);
-            byte[] bytes = modifyClass(ctClass.toBytecode(), className, modifyMatchMaps);
+            Log.info("====start modifying ${className}====");
+//            CtClass ctClass = ClassPool.getDefault().get(className);
+            byte[] bytes = modifyClass(classByteCode, className, modifyMatchMaps);
             if (stream == null) {
-                ctClass.writeFile(targetDir);
+                //write to class file @targetDir
             } else {
                 stream.write(bytes);
             }
-            ctClass.detach();
             Log.info("====finish modifying ${className}====");
             return true;
         } catch (Exception e) {
@@ -37,21 +31,6 @@ public class InjectUtil {
         return false;
     }
 
-    public static void initClassPathList(List<String> classPathList) {
-        try {
-            if (!classPathInited) {
-                for (String classDir : classPathList) {
-                    File cp = new File(classDir);
-                    ClassPath mClassPath = ClassPool.getDefault()
-                            .insertClassPath(cp.getAbsolutePath().replaceAll("\\\\", "/"));
-                    Log.info("add classpath : " + cp.getAbsolutePath());
-                }
-                classPathInited = true;
-            }
-        } catch (NotFoundException e1) {
-            e1.printStackTrace();
-        }
-    }
 
     private
     static byte[] modifyClass(byte[] srcClass, String className, List<Map<String, Object>> modifyMatchMaps) throws IOException {
