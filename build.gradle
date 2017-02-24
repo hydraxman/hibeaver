@@ -25,7 +25,7 @@ repositories {
     mavenCentral()
 }
 group = 'com.bryansharp'
-version = '1.1.1'
+version = '1.1.2'
 uploadArchives {
     repositories {
         mavenDeployer {
