@@ -25,12 +25,13 @@ repositories {
     mavenCentral()
 }
 group = 'com.bryansharp'
-version = '1.2.0'
+version = '1.2.1'
 uploadArchives {
+    version = version + '-SNAPSHOT'
     repositories {
         mavenDeployer {
-            repository(url: uri('../repo'))
-            snapshotRepository(url: uri('../snapshotrepo'))
+            repository(url: uri('./repo'))
+            snapshotRepository(url: uri('./snapshotRepo'))
         }
     }
 }

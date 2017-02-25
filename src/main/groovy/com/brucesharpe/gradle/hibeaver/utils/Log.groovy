@@ -30,9 +30,6 @@ public class Log {
         println ""
 
     }
-    def static logOpcode(int opCode) {
-        info("指令："+ getOpName(opCode));
-    }
 
     def static String getOpName(int opCode) {
         return getOpMap().get(opCode);

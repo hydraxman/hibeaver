@@ -5,8 +5,9 @@ import com.android.annotations.Nullable
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.brucesharpe.gradle.hibeaver.utils.InjectUtil
+import com.brucesharpe.gradle.hibeaver.utils.DataHelper
 import com.brucesharpe.gradle.hibeaver.utils.Log
+import com.brucesharpe.gradle.hibeaver.utils.ModifyClassUtil
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -83,6 +84,7 @@ public class InjectTransform extends Transform {
             }
             input.jarInputs.each { JarInput jarInput ->
                 classPaths.add(jarInput.file.absolutePath)
+                Log.info("项目包含的jar包：${jarInput.file.absolutePath}");
             }
         }
 
@@ -105,12 +107,16 @@ public class InjectTransform extends Transform {
                 }
                 /** 获得输出文件*/
                 File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR);
-//                Log.info("dest jar  ${dest.absolutePath}")
-                Log.info("项目包含的jar包：${jarInput.file.absolutePath}")
-                //TODO 先扫描一个jar中的所有entry，如果包含需要修改的项目，再生成新文件
-                //TODO 修改后的jar 单独放置在一处
-                def optJar = injectJarFiles(jarInput.file, context.getTemporaryDir())
-                FileUtils.copyFile(optJar, dest);
+                def modifiedJar = null;
+                if (isJarNeedModify(jarInput.file)) {
+                    modifiedJar = modifyJarFile(jarInput.file, context.getTemporaryDir());
+                }
+                if (modifiedJar == null) {
+                    modifiedJar = jarInput.file;
+                } else {
+                    saveModifiedJarForCheck(modifiedJar);
+                }
+                FileUtils.copyFile(modifiedJar, dest);
             }
             /**
              * 遍历目录
@@ -122,6 +128,15 @@ public class InjectTransform extends Transform {
                 FileUtils.copyDirectory(directoryInput.file, dest);
             }
         }
+    }
+
+    private static void saveModifiedJarForCheck(File optJar) {
+        File dir = DataHelper.ext.hiBeaverDir;
+        File checkJarFile = new File(dir, optJar.getName());
+        if (checkJarFile.exists()) {
+            checkJarFile.delete();
+        }
+        FileUtils.copyFile(optJar, checkJarFile);
     }
 
     static boolean shouldModifyClass(String className) {
@@ -137,9 +152,8 @@ public class InjectTransform extends Transform {
      * @param buildDir 是项目的build class目录,就是我们需要注入的class所在地
      * @param lib 这个是hackdex的目录,就是AntilazyLoad类的class文件所在地
      */
-    public static File injectJarFiles(File jarFile, File tempDir) {
+    public static File modifyJarFile(File jarFile, File tempDir) {
         if (jarFile) {
-            boolean modified = false;
             /** 设置输出到的jar */
             def hexName = DigestUtils.md5Hex(jarFile.absolutePath).substring(0, 8);
             def optJar = new File(tempDir, hexName + jarFile.name)
@@ -159,29 +173,55 @@ public class InjectTransform extends Transform {
                 ZipEntry zipEntry = new ZipEntry(entryName);
 
                 jarOutputStream.putNextEntry(zipEntry);
+
+                byte[] modifiedClassBytes = null;
+                byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
                 if (entryName.endsWith(".class")) {
                     className = entryName.replace("/", ".").replace(".class", "")
-//                    String classSimpleName = entryName.substring(className.lastIndexOf("."))
                     if (shouldModifyClass(className)) {
-                        if (InjectUtil.modifyClasses(className, IOUtils.toByteArray(inputStream), null, jarOutputStream, project.hiBeaver.modifyMatchMaps)) {
-                            modified = true;
-                        } else {
-                            jarOutputStream.write(IOUtils.toByteArray(inputStream));
-                        }
-                    } else {
-                        jarOutputStream.write(IOUtils.toByteArray(inputStream));
+                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, project.hiBeaver.modifyMatchMaps);
                     }
+                }
+                if (modifiedClassBytes == null) {
+                    jarOutputStream.write(sourceClassBytes);
                 } else {
-                    jarOutputStream.write(IOUtils.toByteArray(inputStream));
+                    jarOutputStream.write(modifiedClassBytes);
                 }
                 jarOutputStream.closeEntry();
             }
-            if (modified) {
-                Log.info("${hexName} is modified");
-            }
+            Log.info("${hexName} is modified");
             jarOutputStream.close();
             file.close();
             return optJar;
+        }
+        return null;
+    }
+    /**
+     * 该jar文件是否包含需要修改的类
+     * @param jarFile
+     * @return
+     */
+    public static boolean isJarNeedModify(File jarFile) {
+        if (jarFile) {
+            boolean modified = false;
+            /**
+             * 读取原jar
+             */
+            def file = new JarFile(jarFile);
+            Enumeration enumeration = file.entries();
+            while (enumeration.hasMoreElements()) {
+                JarEntry jarEntry = (JarEntry) enumeration.nextElement();
+                String entryName = jarEntry.getName();
+                String className
+                if (entryName.endsWith(".class")) {
+                    className = entryName.replace("/", ".").replace(".class", "")
+                    if (shouldModifyClass(className)) {
+                        modified = true;
+                    }
+                }
+            }
+            file.close();
+            return modified;
         }
     }
 

@@ -1,8 +1,6 @@
 package com.brucesharpe.gradle.hibeaver.utils
 
 import org.objectweb.asm.*
-
-import java.util.jar.JarOutputStream
 /**
  * Created by MrBu(bsp0911932@163.com) on 2016/5/10.
  *
@@ -10,25 +8,20 @@ import java.util.jar.JarOutputStream
  * Project: FirstGradle
  * introduction:
  */
-public class InjectUtil {
+public class ModifyClassUtil {
 
     public
-    static boolean modifyClasses(String className, byte[] classByteCode, String targetDir, JarOutputStream stream, List<Map<String, Object>> modifyMatchMaps) {
+    static byte[] modifyClasses(String className, byte[] classByteCode, List<Map<String, Object>> modifyMatchMaps) {
+        byte[] classBytesCode = null;
         try {
             Log.info("====start modifying ${className}====");
-//            CtClass ctClass = ClassPool.getDefault().get(className);
-            byte[] bytes = modifyClass(classByteCode, className, modifyMatchMaps);
-            if (stream == null) {
-                //write to class file @targetDir
-            } else {
-                stream.write(bytes);
-            }
+            classBytesCode = modifyClass(classByteCode, className, modifyMatchMaps);
             Log.info("====finish modifying ${className}====");
-            return true;
+            return classBytesCode;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return classBytesCode;
     }
 
 

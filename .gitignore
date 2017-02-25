@@ -2,6 +2,8 @@
 ### Gradle template
 .gradle
 build/
+repo
+snapshotRepo
 local.properties
 
 .idea
