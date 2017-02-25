@@ -66,10 +66,8 @@ public class InjectTransform extends Transform {
 //        String flavorAndBuildType = context.name.split("For")[1]
 //        Log.info("flavorAndBuildType ${flavorAndBuildType}")
         targetClasses = [];
-        project.hiBeaver.modifyMatchMaps.each {
-            Map<String, Object> map ->
-                targetClasses.add(map.get('class').toString());
-        }
+        Map<String, List<Map<String, Object>>> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
+        targetClasses.addAll(modifyMatchMaps.keySet());
         /**
          * 获取所有依赖的classPaths
          */
@@ -179,7 +177,7 @@ public class InjectTransform extends Transform {
                 if (entryName.endsWith(".class")) {
                     className = entryName.replace("/", ".").replace(".class", "")
                     if (shouldModifyClass(className)) {
-                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, project.hiBeaver.modifyMatchMaps);
+                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, project.hiBeaver.modifyMatchMaps.get(className));
                     }
                 }
                 if (modifiedClassBytes == null) {

@@ -5,5 +5,5 @@ public class HiBeaverParams {
     boolean enableModify = true
     boolean watchTimeConsume = false
     boolean keepQuiet = false
-    List<Map<String,Object>> modifyMatchMaps
+    Map<String, List<Map<String, Object>>> modifyMatchMaps
 }

@@ -1,6 +1,7 @@
 package com.brucesharpe.gradle.hibeaver.utils
 
 import org.objectweb.asm.*
+
 /**
  * Created by MrBu(bsp0911932@163.com) on 2016/5/10.
  *
@@ -11,11 +12,13 @@ import org.objectweb.asm.*
 public class ModifyClassUtil {
 
     public
-    static byte[] modifyClasses(String className, byte[] classByteCode, List<Map<String, Object>> modifyMatchMaps) {
+    static byte[] modifyClasses(String className, byte[] srcByteCode, List<Map<String, Object>> methodMatchMaps) {
         byte[] classBytesCode = null;
         try {
             Log.info("====start modifying ${className}====");
-            classBytesCode = modifyClass(classByteCode, className, modifyMatchMaps);
+            classBytesCode = modifyClass(srcByteCode, methodMatchMaps);
+            Log.info("====revisit modified ${className}====");
+            onlyVisitClassMethod(classBytesCode, methodMatchMaps);
             Log.info("====finish modifying ${className}====");
             return classBytesCode;
         } catch (Exception e) {
@@ -26,23 +29,33 @@ public class ModifyClassUtil {
 
 
     private
-    static byte[] modifyClass(byte[] srcClass, String className, List<Map<String, Object>> modifyMatchMaps) throws IOException {
+    static byte[] modifyClass(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassAdapter adapter = new MethodFilterClassAdapter(classWriter, className, modifyMatchMaps);
+        ClassAdapter adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
         ClassReader cr = new ClassReader(srcClass);
         cr.accept(adapter, ClassReader.SKIP_DEBUG);
         return classWriter.toByteArray();
     }
 
+    private
+    static void onlyVisitClassMethod(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        MethodFilterClassAdapter adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
+        adapter.onlyVisit = true;
+        ClassReader cr = new ClassReader(srcClass);
+        cr.accept(adapter, ClassReader.SKIP_DEBUG);
+    }
+
     static class MethodFilterClassAdapter extends ClassAdapter implements Opcodes {
-        private String className;
-        private List<Map<String, Object>> modifyMatchMaps;
+//        private String className;
+        private List<Map<String, Object>> methodMatchMaps;
+        public boolean onlyVisit = false;
 
         public MethodFilterClassAdapter(
-                final ClassVisitor cv, String className, List<Map<String, Object>> modifyMatchMaps) {
+                final ClassVisitor cv, List<Map<String, Object>> methodMatchMaps) {
             super(cv);
-            this.className = className;
-            this.modifyMatchMaps = modifyMatchMaps;
+//            this.className = className;
+            this.methodMatchMaps = methodMatchMaps;
         }
 
         @Override
@@ -57,26 +70,32 @@ public class ModifyClassUtil {
         public MethodVisitor visitMethod(int access, String name,
                                          String desc, String signature, String[] exceptions) {
             MethodVisitor myMv = null;
-            Log.logEach("*visitMethod*${className}*", access, name, desc, signature);
-            modifyMatchMaps.each {
+            if (!onlyVisit) {
+                Log.logEach("* visitMethod *", access, name, desc, signature);
+            }
+            methodMatchMaps.each {
                 Map<String, Object> map ->
-                    String targetClassName = map.get('class').toString();
-                    if (className.equals(targetClassName)) {
-                        String metName = map.get('methodName');
-                        String methodDesc = map.get('methodDesc');
-                        if (name.equals(metName)) {
-                            Closure visit = map.get('adapter');
-                            if (methodDesc != null) {
-                                if (methodDesc.equals(desc)) {
+                    String metName = map.get('methodName');
+                    String methodDesc = map.get('methodDesc');
+                    if (name.equals(metName)) {
+                        Closure visit = map.get('adapter');
+                        if (methodDesc != null) {
+                            if (methodDesc.equals(desc)) {
+                                if (onlyVisit) {
+                                    myMv = new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
+                                } else {
                                     myMv = visit(cv, access, name, desc, signature, exceptions);
                                 }
-                            } else {
-                                myMv = visit(cv, access, name, desc, signature, exceptions);
                             }
+                        } else {
+                            myMv = visit(cv, access, name, desc, signature, exceptions);
                         }
                     }
             }
             if (myMv != null) {
+                if (onlyVisit) {
+                    Log.logEach("* revisitMethod *", access, name, desc, signature);
+                }
                 return myMv;
             } else {
                 return cv.visitMethod(access, name, desc, signature, exceptions);
