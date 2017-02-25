@@ -10,8 +10,8 @@
 - apply class match wildcard
 - modify class: provide function to add methods or constructors
 - create a new class
-- fix the exception: Error:Execution failed for task ':app:mockableAndroidJar'.
-                     > org/objectweb/asm/tree/ClassNode
+- fix the exception: Error:Execution failed for task ':submodule:app:mockableAndroidJar'.
+                     > class org.objectweb.asm.tree.ClassNode has interface org.objectweb.asm.ClassVisitor as super class
 
 ##Further Features
 
