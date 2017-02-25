@@ -6,6 +6,9 @@ repo
 snapshotRepo
 local.properties
 
+# this file can be easily created by your own
+settings.gradle
+
 .idea
 *.iml
 out
