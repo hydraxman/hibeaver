@@ -23,6 +23,7 @@ public class Log {
         if (quiet) return;
         if (!showHelp) return;
         try {
+            println("");
             def stream = Log.class.getClassLoader().getResourceAsStream('helpContent.groovy')
             def helpContent = new String(IOUtils.toByteArray(stream), 'UTF-8');
             println helpContent;
