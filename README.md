@@ -71,4 +71,6 @@ and then add this to you app build scripts:
 
 You can also see the content above in the build log outputs.
 
+There is also a demo showing how to use it. You can either get it through git submodule and add a settings.gradle file to include the module, or get it by checking out [hiBeaverDemo](https://github.com/BryanSharp/hiBeaverDemo).
+
 Hope you can enjoy it! Any comment and suggestion is welcomed.
