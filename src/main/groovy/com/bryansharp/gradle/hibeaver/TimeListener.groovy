@@ -1,6 +1,6 @@
-package com.brucesharpe.gradle.hibeaver
+package com.bryansharp.gradle.hibeaver
 
-import com.brucesharpe.gradle.hibeaver.utils.Log
+import com.bryansharp.gradle.hibeaver.utils.Log
 import org.gradle.BuildListener
 import org.gradle.BuildResult
 import org.gradle.api.Task
@@ -25,7 +25,7 @@ class TimeListener implements TaskExecutionListener, BuildListener {
     void afterExecute(Task task, TaskState taskState) {
         def ms = clock.timeInMs
         times.add([ms, task.path])
-        totalTime+=ms;
+        totalTime += ms;
         Log.info "${task.path} 花费时间 spend ${ms}ms"
     }
 

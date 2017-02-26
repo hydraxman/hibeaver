@@ -1,4 +1,6 @@
-package com.brucesharpe.gradle.hibeaver.utils
+package com.bryansharp.gradle.hibeaver.utils
+
+import org.apache.commons.io.IOUtils
 
 public class Log {
 
@@ -6,25 +8,40 @@ public class Log {
         //此处如果不加@会导致循环调用
         Log.@quiet = quiet
     }
-    def static boolean quiet=false
+
+    static void setShowHelp(boolean showHelp) {
+        //此处如果不加@会导致循环调用
+        Log.@showHelp = showHelp
+    }
+    def static boolean quiet = false
+    def static boolean showHelp = false
     def static boolean learnMode = false
 
+    def static logHelp() {
+        if (!showHelp) {
+            return;
+        }
+        def stream = Log.class.getClassLoader().getResourceAsStream('helpContent.groovy')
+        def helpContent = new String(IOUtils.toByteArray(stream), 'UTF-8');
+        println helpContent;
+    }
 
     def static learn(Object msg) {
-        if(quiet) return
+        if (quiet) return
         if (learnMode) {
             println "learn:${msg}"
         }
     }
 
     def static info(Object msg) {
-        if(quiet) return
+        if (quiet) return
         println "${msg}"
     }
-    def static logEach(Object...msg) {
-        if(quiet) return
+
+    def static logEach(Object... msg) {
+        if (quiet) return
         msg.each {
-            m->
+            m ->
                 print "${m}\t"
         }
         println ""

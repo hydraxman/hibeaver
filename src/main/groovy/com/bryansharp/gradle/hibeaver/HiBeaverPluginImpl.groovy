@@ -1,8 +1,8 @@
-package com.brucesharpe.gradle.hibeaver
+package com.bryansharp.gradle.hibeaver
 
 import com.android.build.gradle.BaseExtension
-import com.brucesharpe.gradle.hibeaver.utils.DataHelper
-import com.brucesharpe.gradle.hibeaver.utils.Log
+import com.bryansharp.gradle.hibeaver.utils.DataHelper
+import com.bryansharp.gradle.hibeaver.utils.Log
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -11,9 +11,11 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     void apply(Project project) {
         println ":applied HiBeaver"
         project.extensions.create('hiBeaver', HiBeaverParams)
+        Log.setQuiet(project.hiBeaver.keepQuiet);
+        Log.setShowHelp(project.hiBeaver.showHelp);
+        Log.logHelp();
         registerTransform(project)
         initDir(project);
-        Log.setQuiet(project.hiBeaver.keepQuiet);
         project.afterEvaluate {
             if (project.hiBeaver.watchTimeConsume) {
                 Log.info "watchTimeConsume enabled"

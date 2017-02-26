@@ -1,4 +1,4 @@
-package com.brucesharpe.gradle.hibeaver.utils
+package com.bryansharp.gradle.hibeaver.utils
 
 import org.objectweb.asm.*
 

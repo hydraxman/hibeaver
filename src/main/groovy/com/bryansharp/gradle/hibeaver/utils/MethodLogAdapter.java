@@ -1,4 +1,4 @@
-package com.brucesharpe.gradle.hibeaver.utils;
+package com.bryansharp.gradle.hibeaver.utils;
 
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Label;
@@ -13,6 +13,16 @@ public class MethodLogAdapter extends MethodAdapter {
 
     public MethodLogAdapter(MethodVisitor mv) {
         super(mv);
+    }
+
+    /**
+     * turn "com.bryansharp.util" to "com/bryansharp/util"
+     *
+     * @param classname full class name
+     * @return class path
+     */
+    public static String className2Path(String classname) {
+        return classname.replace('.', '/');
     }
 
     @Override
@@ -134,7 +144,6 @@ public class MethodLogAdapter extends MethodAdapter {
         Log.logEach("visitLocalVariable", s, s1, s2, label, label1, i);
         super.visitLocalVariable(s, s1, s2, label, label1, i);
     }
-
 
     @Override
     public void visitInsn(int opcode) {

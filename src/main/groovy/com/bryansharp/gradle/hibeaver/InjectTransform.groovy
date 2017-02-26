@@ -1,13 +1,13 @@
-package com.brucesharpe.gradle.hibeaver
+package com.bryansharp.gradle.hibeaver
 
 import com.android.annotations.NonNull
 import com.android.annotations.Nullable
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.brucesharpe.gradle.hibeaver.utils.DataHelper
-import com.brucesharpe.gradle.hibeaver.utils.Log
-import com.brucesharpe.gradle.hibeaver.utils.ModifyClassUtil
+import com.bryansharp.gradle.hibeaver.utils.DataHelper
+import com.bryansharp.gradle.hibeaver.utils.Log
+import com.bryansharp.gradle.hibeaver.utils.ModifyClassUtil
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
