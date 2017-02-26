@@ -11,12 +11,12 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     void apply(Project project) {
         println ":applied HiBeaver"
         project.extensions.create('hiBeaver', HiBeaverParams)
-        Log.setQuiet(project.hiBeaver.keepQuiet);
-        Log.setShowHelp(project.hiBeaver.showHelp);
-        Log.logHelp();
         registerTransform(project)
         initDir(project);
         project.afterEvaluate {
+            Log.setQuiet(project.hiBeaver.keepQuiet);
+            Log.setShowHelp(project.hiBeaver.showHelp);
+            Log.logHelp();
             if (project.hiBeaver.watchTimeConsume) {
                 Log.info "watchTimeConsume enabled"
                 project.gradle.addListener(new TimeListener())

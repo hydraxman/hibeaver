@@ -1,7 +1,9 @@
-////////////////////// - HiBeaver Help Content - /////////////////////////////
+////////////////////// - HiBeaver Help Content(UTF-8) - /////////////////////////////
 //          A HiBeaver plugin setup case is shown as below
 //          You can copy-paste them entirely and de-comment them as an initial setup
 //          You can turn Help Content output off by setting the showHelp flag false
+//          hi, 这里是HiBeaver帮助内容，你可以直接把这整个内容复制到build.gradle中，然后解除注释作为初始设置
+//          如果嫌烦可以在下面配置showHelp = false 来关闭这个帮助内容的输出
 //
 //import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
 //import org.objectweb.asm.ClassVisitor
@@ -59,5 +61,6 @@
 //    ]
 //}
 //
+// author BryanSharp bsp0911932@163.com
 ///////////////////// - HiBeaver Help Content END - /////////////////////////////
 

@@ -71,7 +71,7 @@ public class ModifyClassUtil {
                                          String desc, String signature, String[] exceptions) {
             MethodVisitor myMv = null;
             if (!onlyVisit) {
-                Log.logEach("* visitMethod *", access, name, desc, signature);
+                Log.logEach("* visitMethod *", access, name, desc, signature, exceptions);
             }
             methodMatchMaps.each {
                 Map<String, Object> map ->

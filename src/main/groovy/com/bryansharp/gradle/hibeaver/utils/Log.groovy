@@ -2,6 +2,8 @@ package com.bryansharp.gradle.hibeaver.utils
 
 import org.apache.commons.io.IOUtils
 
+import java.lang.reflect.Array
+
 public class Log {
 
     static void setQuiet(boolean quiet) {
@@ -18,12 +20,14 @@ public class Log {
     def static boolean learnMode = false
 
     def static logHelp() {
-        if (!showHelp) {
-            return;
+        if (quiet) return;
+        if (!showHelp) return;
+        try {
+            def stream = Log.class.getClassLoader().getResourceAsStream('helpContent.groovy')
+            def helpContent = new String(IOUtils.toByteArray(stream), 'UTF-8');
+            println helpContent;
+        } catch (Exception e) {
         }
-        def stream = Log.class.getClassLoader().getResourceAsStream('helpContent.groovy')
-        def helpContent = new String(IOUtils.toByteArray(stream), 'UTF-8');
-        println helpContent;
     }
 
     def static learn(Object msg) {
@@ -35,14 +39,40 @@ public class Log {
 
     def static info(Object msg) {
         if (quiet) return
-        println "${msg}"
+        try {
+            println "${msg}"
+        } catch (Exception e) {
+        }
     }
 
     def static logEach(Object... msg) {
         if (quiet) return
         msg.each {
-            m ->
-                print "${m}\t"
+            Object m ->
+                try {
+                    if (m != null) {
+                        if (m.class.isArray()) {
+                            print "["
+                            def length = Array.getLength(m);
+                            if (length > 0) {
+                                for (int i = 0; i < length; i++) {
+                                    def get = Array.get(m, i);
+                                    if (get != null) {
+                                        print "${get}\t"
+                                    } else {
+                                        print "null\t"
+                                    }
+                                }
+                            }
+                            print "]\t"
+                        } else {
+                            print "${m}\t"
+                        }
+                    } else {
+                        print "null\t"
+                    }
+                } catch (Exception e) {
+                }
         }
         println ""
 

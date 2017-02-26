@@ -122,7 +122,7 @@ public class InjectTransform extends Transform {
              */
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY);
-                Log.info("dest dir  ${dest.absolutePath}")
+//                Log.info("dest dir  ${dest.absolutePath}")
                 FileUtils.copyDirectory(directoryInput.file, dest);
             }
         }
@@ -187,7 +187,7 @@ public class InjectTransform extends Transform {
                 }
                 jarOutputStream.closeEntry();
             }
-            Log.info("${hexName} is modified");
+//            Log.info("${hexName} is modified");
             jarOutputStream.close();
             file.close();
             return optJar;

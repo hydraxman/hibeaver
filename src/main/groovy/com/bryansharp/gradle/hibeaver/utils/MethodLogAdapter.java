@@ -51,7 +51,7 @@ public class MethodLogAdapter extends MethodAdapter {
 
     @Override
     public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
-        Log.logEach("visitFrame", type, nLocal, nStack);
+        Log.logEach("visitFrame", type, local, nLocal, nStack, stack);
         super.visitFrame(type, nLocal, local, nStack, stack);
     }
 
@@ -105,7 +105,7 @@ public class MethodLogAdapter extends MethodAdapter {
 
     @Override
     public void visitLookupSwitchInsn(Label label, int[] ints, Label[] labels) {
-        Log.logEach("visitLookupSwitchInsn", label);
+        Log.logEach("visitLookupSwitchInsn", label, ints, labels);
         super.visitLookupSwitchInsn(label, ints, labels);
     }
 
@@ -117,7 +117,7 @@ public class MethodLogAdapter extends MethodAdapter {
 
     @Override
     public void visitTableSwitchInsn(int i, int i1, Label label, Label[] labels) {
-        Log.logEach("visitTableSwitchInsn", i, i1, label);
+        Log.logEach("visitTableSwitchInsn", i, i1, label, labels);
         super.visitTableSwitchInsn(i, i1, label, labels);
     }
 
