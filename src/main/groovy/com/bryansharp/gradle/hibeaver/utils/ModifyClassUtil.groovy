@@ -24,6 +24,9 @@ public class ModifyClassUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (classBytesCode == null) {
+            classBytesCode = srcByteCode;
+        }
         return classBytesCode;
     }
 
@@ -79,16 +82,28 @@ public class ModifyClassUtil {
                     String methodDesc = map.get('methodDesc');
                     if (name.equals(metName)) {
                         Closure visit = map.get('adapter');
-                        if (methodDesc != null) {
-                            if (methodDesc.equals(desc)) {
-                                if (onlyVisit) {
-                                    myMv = new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
-                                } else {
+                        if (visit != null) {
+                            if (methodDesc != null) {
+                                if (methodDesc.equals(desc)) {
+                                    if (onlyVisit) {
+                                        myMv = new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
+                                    } else {
+                                        try {
+                                            myMv = visit(cv, access, name, desc, signature, exceptions);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            myMv = null
+                                        }
+                                    }
+                                }
+                            } else {
+                                try {
                                     myMv = visit(cv, access, name, desc, signature, exceptions);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    myMv = null
                                 }
                             }
-                        } else {
-                            myMv = visit(cv, access, name, desc, signature, exceptions);
                         }
                     }
             }

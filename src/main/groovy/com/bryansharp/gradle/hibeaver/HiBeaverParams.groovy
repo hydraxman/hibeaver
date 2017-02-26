@@ -1,10 +1,10 @@
 package com.bryansharp.gradle.hibeaver
 
 public class HiBeaverParams {
-    String hiBeaverModifyName = null
+    String hiBeaverModifyName = ''
     boolean enableModify = true
     boolean watchTimeConsume = false
     boolean keepQuiet = false
     boolean showHelp = true
-    Map<String, List<Map<String, Object>>> modifyMatchMaps
+    Map<String, List<Map<String, Object>>> modifyMatchMaps = [:]
 }

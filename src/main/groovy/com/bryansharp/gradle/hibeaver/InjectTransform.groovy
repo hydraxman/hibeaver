@@ -67,7 +67,9 @@ public class InjectTransform extends Transform {
 //        Log.info("flavorAndBuildType ${flavorAndBuildType}")
         targetClasses = [];
         Map<String, List<Map<String, Object>>> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
-        targetClasses.addAll(modifyMatchMaps.keySet());
+        if (modifyMatchMaps != null) {
+            targetClasses.addAll(modifyMatchMaps.keySet());
+        }
         /**
          * 获取所有依赖的classPaths
          */
@@ -176,8 +178,9 @@ public class InjectTransform extends Transform {
                 byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
                 if (entryName.endsWith(".class")) {
                     className = entryName.replace("/", ".").replace(".class", "")
-                    if (shouldModifyClass(className)) {
-                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, project.hiBeaver.modifyMatchMaps.get(className));
+                    def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+                    if (modifyMatchMaps != null && shouldModifyClass(className)) {
+                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
                     }
                 }
                 if (modifiedClassBytes == null) {
@@ -200,27 +203,29 @@ public class InjectTransform extends Transform {
      * @return
      */
     public static boolean isJarNeedModify(File jarFile) {
-        if (jarFile) {
-            boolean modified = false;
-            /**
-             * 读取原jar
-             */
-            def file = new JarFile(jarFile);
-            Enumeration enumeration = file.entries();
-            while (enumeration.hasMoreElements()) {
-                JarEntry jarEntry = (JarEntry) enumeration.nextElement();
-                String entryName = jarEntry.getName();
-                String className
-                if (entryName.endsWith(".class")) {
-                    className = entryName.replace("/", ".").replace(".class", "")
-                    if (shouldModifyClass(className)) {
-                        modified = true;
+        boolean modified = false;
+        if (targetClasses != null && targetClasses.size() > 0) {
+            if (jarFile) {
+                /**
+                 * 读取原jar
+                 */
+                def file = new JarFile(jarFile);
+                Enumeration enumeration = file.entries();
+                while (enumeration.hasMoreElements()) {
+                    JarEntry jarEntry = (JarEntry) enumeration.nextElement();
+                    String entryName = jarEntry.getName();
+                    String className
+                    if (entryName.endsWith(".class")) {
+                        className = entryName.replace("/", ".").replace(".class", "")
+                        if (shouldModifyClass(className)) {
+                            modified = true;
+                        }
                     }
                 }
+                file.close();
             }
-            file.close();
-            return modified;
         }
+        return modified;
     }
 
     private static void writeStreamWithBuffer(InputStream inputStream, OutputStream out) {
