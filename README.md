@@ -35,39 +35,13 @@ and then add this to you app build scripts:
     
         //this is the most important part
         modifyMatchMaps = [
-                'com.xiaomi.mipush.sdk.u': [
+                'the classname of which you want to modify': [
                         // you can use javap -s command to get the description of one method
-                        ['methodName': 'a', 'methodDesc': '(Lorg/apache/thrift/a;Lcom/xiaomi/xmpush/thrift/a;ZLcom/xiaomi/xmpush/thrift/r;)V', 'adapter': {
+                        ['methodName': 'name of the method', 'methodDesc': 'method description', 'adapter': {
                             ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-                                MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-                                    @Override
-                                    void visitCode() {
-                                        super.visitCode();
-                                        methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
-                                        methodVisitor.visitVarInsn(Opcodes.ALOAD, 2);
-                                        methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, MethodLogAdapter.className2Path("bruce.com.testhibeaver.MainActivity"), "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-                                    }
-                                }
-                                return adapter;
+                                return null;
                         }]
                 ],
-                'okhttp3.internal.http.HttpEngine': [
-                        ['methodName': '<init>', 'methodDesc': null, 'adapter': {
-                            ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-                                MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-                                    @Override
-                                    void visitCode() {
-                                        super.visitCode();
-                                        methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
-                                        methodVisitor.visitVarInsn(Opcodes.ALOAD, 2);
-                                        methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-                                    }
-                                }
-                                return adapter;
-                        }]
-                ]
         ]
     }
 
