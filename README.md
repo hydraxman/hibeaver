@@ -1,16 +1,14 @@
 #HiBeaver
 
-HiBeaver is an android plugin for modifying your library jars byte code.
+Beaver mean 河狸 in Chinese, cute animals always busy in building their river dam.
+
+HiBeaver is an Android plugin for modifying your library jars byte code.
 
 Dress them as if they are naked! Yeah~
 
-This plugin is uploaded to jitpack. You can use this by adding the following code to your buildScripts:
+This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
-    classpath 'com.github.BryanSharp:hibeaver:1.2.1'
-
-jitpack Maven Repo is needed, add this:
-
-    maven { url 'https://jitpack.io' }
+    classpath 'com.bryansharp:HiBeaver:1.2.2'
 
 and then add this to you app build scripts:
 
@@ -72,5 +70,13 @@ and then add this to you app build scripts:
 You can also see the content above in the build log outputs.
 
 There is also a demo showing how to use it. You can either get it through git submodule and add a settings.gradle file to include the module, or get it by checking out [hiBeaverDemo](https://github.com/BryanSharp/hiBeaverDemo).
+
+This plugin is also uploaded to jitpack. You can use jitpack version by adding the following code to your buildScripts:
+
+    classpath 'com.github.BryanSharp:hibeaver:1.2.1'
+
+using jitpack version, its Maven Repo is needed, add this as well:
+
+    maven { url 'https://jitpack.io' }
 
 Hope you can enjoy it! Any comment and suggestion is welcomed.
