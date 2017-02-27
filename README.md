@@ -67,7 +67,7 @@ and then add this to you app build scripts:
                                 }
                                 return adapter;
                         }]
-                ],
+                ]
         ]
     }
 
