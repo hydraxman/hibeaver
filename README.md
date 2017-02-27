@@ -2,7 +2,7 @@
 
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
 
-Beaver means 河狸 in Chinese, cute animals always busy in building their great river dam.
+Beaver means 河狸 in Chinese, cute animals always busy in building their cute river dam.
 
 HiBeaver is an Android plugin for modifying your library jars byte code.
 
