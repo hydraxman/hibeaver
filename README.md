@@ -39,7 +39,8 @@ and then add this to you app build scripts:
                         // you can use javap -s command to get the description of one method
                         ['methodName': 'name of the method', 'methodDesc': 'method description', 'adapter': {
                             ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                return null;
+                                //return the following part to check the method byte code
+                                return new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
                         }]
                 ],
         ]
