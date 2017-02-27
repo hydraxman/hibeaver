@@ -12,6 +12,8 @@ This plugin has been uploaded to jcenter. You can use this by adding the followi
 
     classpath 'com.bryansharp:HiBeaver:1.2.2'
 
+[Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
+
 and then add this to you app build scripts:
 
     apply plugin: 'hiBeaver'
