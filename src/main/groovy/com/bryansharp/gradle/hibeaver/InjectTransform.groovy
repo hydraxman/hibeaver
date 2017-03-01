@@ -8,6 +8,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.bryansharp.gradle.hibeaver.utils.DataHelper
 import com.bryansharp.gradle.hibeaver.utils.Log
 import com.bryansharp.gradle.hibeaver.utils.ModifyClassUtil
+import groovy.io.FileType
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -81,7 +82,9 @@ public class InjectTransform extends Transform {
                 classPaths.add(directoryInput.file.absolutePath)
                 buildTypes = directoryInput.file.name
                 productFlavors = directoryInput.file.parentFile.name
+                Log.info("项目包含的class文件夹：${directoryInput.file.absolutePath}");
             }
+            Log.info('===============================')
             input.jarInputs.each { JarInput jarInput ->
                 classPaths.add(jarInput.file.absolutePath)
                 Log.info("项目包含的jar包：${jarInput.file.absolutePath}");
@@ -125,7 +128,26 @@ public class InjectTransform extends Transform {
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY);
 //                Log.info("dest dir  ${dest.absolutePath}")
-                FileUtils.copyDirectory(directoryInput.file, dest);
+                File dir = directoryInput.file
+                if (dir) {
+                    HashMap<String, File> modifyMap = new HashMap<>();
+                    dir.traverse(type: FileType.FILES, nameFilter: ~/.*\.class/) {
+                        File classFile ->
+                            File modified = modifyClassFile(dir, classFile, context.getTemporaryDir());
+                            if (modified != null) {
+                                modifyMap.put(classFile.absolutePath.replace(dir.absolutePath, ""), modified);
+                            }
+                    }
+                    FileUtils.copyDirectory(directoryInput.file, dest);
+                    modifyMap.entrySet().each {
+                        Map.Entry<String, File> en ->
+                            File target = new File(dest.absolutePath + en.getKey());
+                            if (target.exists()) {
+                                target.delete();
+                            }
+                            FileUtils.copyFile(en.getValue(), target);
+                    }
+                }
             }
         }
     }
@@ -162,6 +184,7 @@ public class InjectTransform extends Transform {
              * 读取原jar
              */
             def file = new JarFile(jarFile);
+            def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
             Enumeration enumeration = file.entries();
             while (enumeration.hasMoreElements()) {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement();
@@ -177,8 +200,7 @@ public class InjectTransform extends Transform {
                 byte[] modifiedClassBytes = null;
                 byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
                 if (entryName.endsWith(".class")) {
-                    className = entryName.replace("/", ".").replace(".class", "")
-                    def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+                    className = path2Classname(entryName)
                     if (modifyMatchMaps != null && shouldModifyClass(className)) {
                         modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
                     }
@@ -196,6 +218,30 @@ public class InjectTransform extends Transform {
             return optJar;
         }
         return null;
+    }
+
+    private static String path2Classname(String entryName) {
+        entryName.replace(File.separator, ".").replace(".class", "")
+    }
+
+    public static File modifyClassFile(File dir, File classFile, File tempDir) {
+        String className = path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
+        def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+        byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
+        File modified;
+        if (shouldModifyClass(className)) {
+            byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
+            if (modifiedClassBytes) {
+                modified = new File(tempDir, className.replace('.', '') + '.class')
+                if (modified.exists()) {
+                    modified.delete();
+                }
+                modified.createNewFile()
+                new FileOutputStream(modified).write(modifiedClassBytes)
+            }
+        }
+        return modified;
+
     }
     /**
      * 该jar文件是否包含需要修改的类
