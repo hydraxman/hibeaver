@@ -20,9 +20,9 @@ import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 
 /**
- * Created by MrBu(bsp0911932@163.com) on 2016/5/7.
+ * Created by bryansharp(bsp0911932@163.com) on 2016/5/7.
  *
- * @author bushaopeng
+ * @author bryansharp
  *         Project: FirstGradle
  *         introduction:
  */

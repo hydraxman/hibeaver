@@ -3,9 +3,9 @@ package com.bryansharp.gradle.hibeaver.utils
 import org.objectweb.asm.*
 
 /**
- * Created by MrBu(bsp0911932@163.com) on 2016/5/10.
+ * Created by bryansharp(bsp0911932@163.com) on 2016/5/10.
  *
- * @author bushaopeng
+ * @author bryansharp
  * Project: FirstGradle
  * introduction:
  */
