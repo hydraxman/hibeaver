@@ -62,11 +62,53 @@ public class ModifyClassUtil {
         }
 
         @Override
+        void visitEnd() {
+            Log.logEach('* visitEnd *');
+            super.visitEnd()
+        }
+
+        @Override
+        void visitAttribute(Attribute attribute) {
+            Log.logEach('* visitAttribute *', attribute, attribute.type, attribute.metaClass, attribute.metaPropertyValues, attribute.properties);
+            super.visitAttribute(attribute)
+        }
+
+        @Override
+        AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+            Log.logEach('* visitAnnotation *', desc, visible);
+            return super.visitAnnotation(desc, visible)
+        }
+
+        @Override
+        void visitInnerClass(String name, String outerName,
+                             String innerName, int access) {
+            Log.logEach('* visitInnerClass *', name, outerName, innerName, Log.accCode2String(access));
+            super.visitInnerClass(name, outerName, innerName, access)
+        }
+
+        @Override
+        void visitOuterClass(String owner, String name, String desc) {
+            Log.logEach('* visitOuterClass *', owner, name, desc);
+            super.visitOuterClass(owner, name, desc)
+        }
+
+        @Override
+        void visitSource(String source, String debug) {
+            Log.logEach('* visitSource *', source, debug);
+            super.visitSource(source, debug)
+        }
+
+        @Override
+        FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+            Log.logEach('* visitField *', Log.accCode2String(access), name, desc, signature, value);
+            return super.visitField(access, name, desc, signature, value)
+        }
+
+        @Override
         public void visit(int version, int access, String name,
                           String signature, String superName, String[] interfaces) {
-            if (cv != null) {
-                cv.visit(version, access, name, signature, superName, interfaces);
-            }
+            Log.logEach('* visit *', Log.accCode2String(access), name, signature, superName, interfaces);
+            super.visit(version, access, name, signature, superName, interfaces);
         }
 
         @Override
@@ -74,7 +116,7 @@ public class ModifyClassUtil {
                                          String desc, String signature, String[] exceptions) {
             MethodVisitor myMv = null;
             if (!onlyVisit) {
-                Log.logEach("* visitMethod *", access, name, desc, signature, exceptions);
+                Log.logEach("* visitMethod *", Log.accCode2String(access), name, desc, signature, exceptions);
             }
             methodMatchMaps.each {
                 Map<String, Object> map ->
@@ -109,7 +151,7 @@ public class ModifyClassUtil {
             }
             if (myMv != null) {
                 if (onlyVisit) {
-                    Log.logEach("* revisitMethod *", access, name, desc, signature);
+                    Log.logEach("* revisitMethod *", Log.accCode2String(access), name, desc, signature);
                 }
                 return myMv;
             } else {

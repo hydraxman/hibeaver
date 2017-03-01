@@ -123,7 +123,6 @@ public class InjectTransform extends Transform {
             }
             /**
              * 遍历目录
-             * 目前对目录不做处理，直接复制
              */
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 File dest = outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY);
@@ -135,6 +134,7 @@ public class InjectTransform extends Transform {
                         File classFile ->
                             File modified = modifyClassFile(dir, classFile, context.getTemporaryDir());
                             if (modified != null) {
+                                //key为相对路径
                                 modifyMap.put(classFile.absolutePath.replace(dir.absolutePath, ""), modified);
                             }
                     }
@@ -142,10 +142,13 @@ public class InjectTransform extends Transform {
                     modifyMap.entrySet().each {
                         Map.Entry<String, File> en ->
                             File target = new File(dest.absolutePath + en.getKey());
+                            Log.info(target.getAbsolutePath());
                             if (target.exists()) {
                                 target.delete();
                             }
                             FileUtils.copyFile(en.getValue(), target);
+                            saveModifiedJarForCheck(en.getValue());
+                            en.getValue().delete();
                     }
                 }
             }
@@ -225,20 +228,23 @@ public class InjectTransform extends Transform {
     }
 
     public static File modifyClassFile(File dir, File classFile, File tempDir) {
-        String className = path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
-        def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
-        byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
         File modified;
-        if (shouldModifyClass(className)) {
-            byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
-            if (modifiedClassBytes) {
-                modified = new File(tempDir, className.replace('.', '') + '.class')
-                if (modified.exists()) {
-                    modified.delete();
+        try {
+            String className = path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
+            def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+            byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
+            if (shouldModifyClass(className)) {
+                byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
+                if (modifiedClassBytes) {
+                    modified = new File(tempDir, className.replace('.', '') + '.class')
+                    if (modified.exists()) {
+                        modified.delete();
+                    }
+                    modified.createNewFile()
+                    new FileOutputStream(modified).write(modifiedClassBytes)
                 }
-                modified.createNewFile()
-                new FileOutputStream(modified).write(modifiedClassBytes)
             }
+        } catch (Exception e) {
         }
         return modified;
 

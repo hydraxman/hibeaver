@@ -84,16 +84,11 @@ public class Log {
     }
     static HashMap<Integer, String> opCodeMap = new HashMap<>();
 
-    public static Map<Integer, String> getOpMap() {
-        if (opCodeMap.size() == 0) {
+    public static HashMap<Integer, String> accCodeMap = new HashMap<>();
+
+    public static Map<Integer, String> getAccCodeMap() {
+        if (accCodeMap.size() == 0) {
             HashMap<String, Integer> map = new HashMap<>();
-            map.put("V1_1", 196653);
-            map.put("V1_2", 46);
-            map.put("V1_3", 47);
-            map.put("V1_4", 48);
-            map.put("V1_5", 49);
-            map.put("V1_6", 50);
-            map.put("V1_7", 51);
             map.put("ACC_PUBLIC", 1);
             map.put("ACC_PRIVATE", 2);
             map.put("ACC_PROTECTED", 4);
@@ -113,27 +108,49 @@ public class Log {
             map.put("ACC_ANNOTATION", 8192);
             map.put("ACC_ENUM", 16384);
             map.put("ACC_DEPRECATED", 131072);
-            map.put("T_BOOLEAN", 4);
-            map.put("T_CHAR", 5);
-            map.put("T_FLOAT", 6);
-            map.put("T_DOUBLE", 7);
-            map.put("T_BYTE", 8);
-            map.put("T_SHORT", 9);
-            map.put("T_INT", 10);
-            map.put("T_LONG", 11);
-            map.put("F_NEW", -1);
-            map.put("F_FULL", 0);
-            map.put("F_APPEND", 1);
-            map.put("F_CHOP", 2);
-            map.put("F_SAME", 3);
-            map.put("F_SAME1", 4);
-            map.put("TOP", 0);
-            map.put("INTEGER", 1);
-            map.put("FLOAT", 2);
-            map.put("DOUBLE", 3);
-            map.put("LONG", 4);
-            map.put("NULL", 5);
-            map.put("UNINITIALIZED_THIS", 6);
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                accCodeMap.put(entry.getValue(), entry.getKey());
+            }
+        }
+        return accCodeMap;
+    }
+
+    public static String accCode2String(int access) {
+        def builder = new StringBuilder();
+        def map = getAccCodeMap();
+        map.entrySet().each {
+            entry ->
+                if ((entry.getKey().intValue() & access) > 0) {
+                    builder.append('|' + entry.getValue() + '|');
+                }
+        }
+        return builder.toString();
+    }
+
+    public static Map<Integer, String> getOpMap() {
+        if (opCodeMap.size() == 0) {
+            HashMap<String, Integer> map = new HashMap<>();
+//            map.put("T_BOOLEAN", 4);
+//            map.put("T_CHAR", 5);
+//            map.put("T_FLOAT", 6);
+//            map.put("T_DOUBLE", 7);
+//            map.put("T_BYTE", 8);
+//            map.put("T_SHORT", 9);
+//            map.put("T_INT", 10);
+//            map.put("T_LONG", 11);
+//            map.put("F_NEW", -1);
+//            map.put("F_FULL", 0);
+//            map.put("F_APPEND", 1);
+//            map.put("F_CHOP", 2);
+//            map.put("F_SAME", 3);
+//            map.put("F_SAME1", 4);
+//            map.put("TOP", 0);
+//            map.put("INTEGER", 1);
+//            map.put("FLOAT", 2);
+//            map.put("DOUBLE", 3);
+//            map.put("LONG", 4);
+//            map.put("NULL", 5);
+//            map.put("UNINITIALIZED_THIS", 6);
             map.put("NOP", 0);
             map.put("ACONST_NULL", 1);
             map.put("ICONST_M1", 2);
