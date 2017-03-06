@@ -132,12 +132,14 @@ public class ModifyClassUtil {
             methodMatchMaps.each {
                 Map<String, Object> map ->
                     String metName = map.get('methodName');
+                    String metMatchType = map.get('methodMatchType');
                     String methodDesc = map.get('methodDesc');
-                    if (name.equals(metName)) {
+                    if (Util.isPatternMatch(metName, metMatchType, name)) {
                         Closure visit = map.get('adapter');
                         if (visit != null) {
+                            //methodDesc 不设置，为空，即代表对methodDesc不限制
                             if (methodDesc != null) {
-                                if (methodDesc.equals(desc)) {
+                                if (Util.isPatternMatch(methodDesc, metMatchType, desc)) {
                                     if (onlyVisit) {
                                         myMv = new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
                                     } else {

@@ -5,9 +5,11 @@ import com.android.annotations.Nullable
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.bryansharp.gradle.hibeaver.utils.Const
 import com.bryansharp.gradle.hibeaver.utils.DataHelper
 import com.bryansharp.gradle.hibeaver.utils.Log
 import com.bryansharp.gradle.hibeaver.utils.ModifyClassUtil
+import com.bryansharp.gradle.hibeaver.utils.Util
 import groovy.io.FileType
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
@@ -17,7 +19,6 @@ import org.gradle.api.Project
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
-import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 
 /**
@@ -28,9 +29,7 @@ import java.util.zip.ZipEntry
  *         introduction:
  */
 public class InjectTransform extends Transform {
-    private final static int MT_FULL = 0;
-    private final static int MT_WILDCARD = 1;
-    private final static int MT_REGEX = 2;
+
     static AppExtension android
     static Map<String, Integer> targetClasses = [:];
     private static Project project;
@@ -79,7 +78,7 @@ public class InjectTransform extends Transform {
                 if (value) {
                     int type;
                     if (value instanceof Map) {
-                        type = typeString2Int(value.get("classMatchType"));
+                        type = Util.typeString2Int(value.get("classMatchType"));
                     } else {
                         type = MT_FULL;
                     }
@@ -171,17 +170,6 @@ public class InjectTransform extends Transform {
         }
     }
 
-    private static int typeString2Int(String type) {
-        if (type == null || "full".equals(type)) {
-            return MT_FULL;
-        } else if ("regEx".equals(type)) {
-            return MT_REGEX;
-        } else if ("wildcard".equals(type)) {
-            return MT_WILDCARD;
-        } else {
-            return MT_FULL;
-        }
-    }
 
     private static void saveModifiedJarForCheck(File optJar) {
         File dir = DataHelper.ext.hiBeaverDir;
@@ -199,18 +187,18 @@ public class InjectTransform extends Transform {
                 def mt = entry.getValue();
                 String key = entry.getKey()
                 switch (mt) {
-                    case MT_FULL:
+                    case Const.MT_FULL:
                         if (className.equals(key)) {
                             return key;
                         }
                         break;
-                    case MT_REGEX:
-                        if (regMatch(key, className)) {
+                    case Const.MT_REGEX:
+                        if (Util.regMatch(key, className)) {
                             return key;
                         }
                         break;
-                    case MT_WILDCARD:
-                        if (wildcardMatch(key, className)) {
+                    case Const.MT_WILDCARD:
+                        if (Util.wildcardMatch(key, className)) {
                             return key;
                         }
                         break;
@@ -222,30 +210,6 @@ public class InjectTransform extends Transform {
         }
     }
 
-    static boolean regMatch(String pattern, String target) {
-        return Pattern.matches(pattern, target);
-    }
-
-    static boolean wildcardMatch(String pattern, String target) {
-        String[] split = pattern.split("\\*[1-3]");
-        for (int i = 0; i < split.length; i++) {
-            String part = split[i]
-            if (part == null || part.trim().length() < 1) {
-                continue;
-            }
-            def index = target.indexOf(part)
-            if (index < 0) {
-                return false;
-            }
-            def newStart = index + part.length()
-            if (newStart < target.length()) {
-                target = target.substring(newStart);
-            } else {
-                target = "";
-            }
-        }
-        return true;
-    }
     /**
      * 植入代码
      * @param buildDir 是项目的build class目录,就是我们需要注入的class所在地
