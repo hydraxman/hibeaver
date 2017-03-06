@@ -12,17 +12,20 @@ import org.objectweb.asm.*
 public class ModifyClassUtil {
 
     public
-    static byte[] modifyClasses(String className, byte[] srcByteCode, List<Map<String, Object>> methodMatchMaps) {
+    static byte[] modifyClasses(String className, byte[] srcByteCode, Object container) {
+        List<Map<String, Object>> methodMatchMaps = getList(container);
         byte[] classBytesCode = null;
-        try {
-            Log.info("====start modifying ${className}====");
-            classBytesCode = modifyClass(srcByteCode, methodMatchMaps);
-            Log.info("====revisit modified ${className}====");
-            onlyVisitClassMethod(classBytesCode, methodMatchMaps);
-            Log.info("====finish modifying ${className}====");
-            return classBytesCode;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (methodMatchMaps) {
+            try {
+                Log.info("====start modifying ${className}====");
+                classBytesCode = modifyClass(srcByteCode, methodMatchMaps);
+                Log.info("====revisit modified ${className}====");
+                onlyVisitClassMethod(classBytesCode, methodMatchMaps);
+                Log.info("====finish modifying ${className}====");
+                return classBytesCode;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if (classBytesCode == null) {
             classBytesCode = srcByteCode;
@@ -30,6 +33,14 @@ public class ModifyClassUtil {
         return classBytesCode;
     }
 
+    static List<Map<String, Object>> getList(Object container) {
+        if (container instanceof List) {
+            return container;
+        } else if (container instanceof Map) {
+            return (List<Map<String, Object>>) container.get("modifyMethods");
+        }
+        return null;
+    }
 
     private
     static byte[] modifyClass(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {

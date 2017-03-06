@@ -17,6 +17,7 @@ import org.gradle.api.Project
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
+import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 
 /**
@@ -27,8 +28,11 @@ import java.util.zip.ZipEntry
  *         introduction:
  */
 public class InjectTransform extends Transform {
+    private final static int MT_FULL = 0;
+    private final static int MT_WILDCARD = 1;
+    private final static int MT_REGEX = 2;
     static AppExtension android
-    static HashSet<String> targetClasses = [];
+    static Map<String, Integer> targetClasses = [:];
     private static Project project;
 
     public InjectTransform(Project project) {
@@ -66,13 +70,25 @@ public class InjectTransform extends Transform {
         android = project.extensions.getByType(AppExtension)
 //        String flavorAndBuildType = context.name.split("For")[1]
 //        Log.info("flavorAndBuildType ${flavorAndBuildType}")
-        targetClasses = [];
-        Map<String, List<Map<String, Object>>> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
+        targetClasses = [:];
+        Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
         if (modifyMatchMaps != null) {
-            targetClasses.addAll(modifyMatchMaps.keySet());
+            def set = modifyMatchMaps.entrySet();
+            for (Map.Entry<String, Map<String, Object>> entry : set) {
+                def value = entry.getValue()
+                if (value) {
+                    int type;
+                    if (value instanceof Map) {
+                        type = typeString2Int(value.get("classMatchType"));
+                    } else {
+                        type = MT_FULL;
+                    }
+                    targetClasses.put(entry.getKey(), type)
+                }
+            }
         }
         /**
-         * 获取所有依赖的classPaths
+         * 获取所有依赖的classPaths,仅做备用
          */
         def classPaths = []
         String buildTypes
@@ -155,6 +171,18 @@ public class InjectTransform extends Transform {
         }
     }
 
+    private static int typeString2Int(String type) {
+        if (type == null || "full".equals(type)) {
+            return MT_FULL;
+        } else if ("regEx".equals(type)) {
+            return MT_REGEX;
+        } else if ("wildcard".equals(type)) {
+            return MT_WILDCARD;
+        } else {
+            return MT_FULL;
+        }
+    }
+
     private static void saveModifiedJarForCheck(File optJar) {
         File dir = DataHelper.ext.hiBeaverDir;
         File checkJarFile = new File(dir, optJar.getName());
@@ -164,14 +192,60 @@ public class InjectTransform extends Transform {
         FileUtils.copyFile(optJar, checkJarFile);
     }
 
-    static boolean shouldModifyClass(String className) {
+    static String shouldModifyClass(String className) {
         if (project.hiBeaver.enableModify) {
-            return targetClasses.contains(className)
+            def set = targetClasses.entrySet();
+            for (Map.Entry<String, Integer> entry : set) {
+                def mt = entry.getValue();
+                String key = entry.getKey()
+                switch (mt) {
+                    case MT_FULL:
+                        if (className.equals(key)) {
+                            return key;
+                        }
+                        break;
+                    case MT_REGEX:
+                        if (regMatch(key, className)) {
+                            return key;
+                        }
+                        break;
+                    case MT_WILDCARD:
+                        if (wildcardMatch(key, className)) {
+                            return key;
+                        }
+                        break;
+                }
+            }
+            return null;
         } else {
-            return false;
+            return null;
         }
     }
 
+    static boolean regMatch(String pattern, String target) {
+        return Pattern.matches(pattern, target);
+    }
+
+    static boolean wildcardMatch(String pattern, String target) {
+        String[] split = pattern.split("\\*[1-3]");
+        for (int i = 0; i < split.length; i++) {
+            String part = split[i]
+            if (part == null || part.trim().length() < 1) {
+                continue;
+            }
+            def index = target.indexOf(part)
+            if (index < 0) {
+                return false;
+            }
+            def newStart = index + part.length()
+            if (newStart < target.length()) {
+                target = target.substring(newStart);
+            } else {
+                target = "";
+            }
+        }
+        return true;
+    }
     /**
      * 植入代码
      * @param buildDir 是项目的build class目录,就是我们需要注入的class所在地
@@ -187,7 +261,7 @@ public class InjectTransform extends Transform {
              * 读取原jar
              */
             def file = new JarFile(jarFile);
-            def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+            Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps
             Enumeration enumeration = file.entries();
             while (enumeration.hasMoreElements()) {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement();
@@ -204,8 +278,9 @@ public class InjectTransform extends Transform {
                 byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
                 if (entryName.endsWith(".class")) {
                     className = path2Classname(entryName)
-                    if (modifyMatchMaps != null && shouldModifyClass(className)) {
-                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
+                    String key = shouldModifyClass(className)
+                    if (modifyMatchMaps != null && key != null) {
+                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
                     }
                 }
                 if (modifiedClassBytes == null) {
@@ -231,10 +306,11 @@ public class InjectTransform extends Transform {
         File modified;
         try {
             String className = path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
-            def modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+            Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps
             byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
-            if (shouldModifyClass(className)) {
-                byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(className));
+            String key = shouldModifyClass(className)
+            if (key != null) {
+                byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
                 if (modifiedClassBytes) {
                     modified = new File(tempDir, className.replace('.', '') + '.class')
                     if (modified.exists()) {
@@ -269,7 +345,7 @@ public class InjectTransform extends Transform {
                     String className
                     if (entryName.endsWith(".class")) {
                         className = entryName.replace("/", ".").replace(".class", "")
-                        if (shouldModifyClass(className)) {
+                        if (shouldModifyClass(className) != null) {
                             modified = true;
                         }
                     }
