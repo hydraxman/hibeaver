@@ -27,7 +27,7 @@ repositories {
 group = 'com.bryansharp'
 version = '1.2.3'
 uploadArchives {
-    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can decomment this.
+//    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can decomment this.
     repositories {
         mavenDeployer {
             repository(url: uri('./repo'))

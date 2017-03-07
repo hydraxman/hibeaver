@@ -12,7 +12,7 @@ Dress them as if they are naked! Yeah~
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
-    classpath 'com.bryansharp:HiBeaver:1.2.2'
+    classpath 'com.bryansharp:HiBeaver:1.2.3'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
