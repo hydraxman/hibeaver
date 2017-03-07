@@ -24,8 +24,6 @@ Beaver means 河狸 in Chinese, cute animals always busy in building their cute 
 
 Basically, HiBeaver is an Android plugin for modifying your java byte code during the building of your package.
 
-Dress them as if they are naked! Yeah~
-
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
     classpath 'com.bryansharp:HiBeaver:1.2.3'
