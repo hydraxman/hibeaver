@@ -1,6 +1,6 @@
 #HiBeaver
 
-By applying the regular expression and wildcard feature, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
+By applying the regular expression and wildcard features, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
 
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
 
