@@ -1,8 +1,20 @@
 #HiBeaver
 
-By applying the regular expression and wildcard features, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
-
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
+
+###简介
+
+HiBeaver是一个Android轻量级AOP的Gradle插件，结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段对Java字节码进行修改，从而支持使用者对字节码进行代码注入和AOP设计，或对项目依赖的Jar包增加Hook节点。
+
+Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和装修大坝的可爱小动物，虽说不上像三峡大坝那样“高峡出平湖”，却也为自然和生态做出了暖男般的贡献。
+
+###快速上手
+
+
+
+##English Version
+
+By applying the regular expression and wildcard features, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
 
 Beaver means 河狸 in Chinese, cute animals always busy in building their cute river dam.
 
