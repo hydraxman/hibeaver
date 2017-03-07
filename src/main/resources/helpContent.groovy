@@ -23,8 +23,10 @@
 //    watchTimeConsume = false
 //
 //    //this is the most important part
-//    //structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
+//    //basic structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
+//    //advanced structure is like: ['classMatchPattern':['classMatchType':'wildcard','modifyMethods':[[:],[:]]],'classMatchPattern':['classMatchType':'regEx','modifyMethods':[[:],[:]]]]
 //    modifyMatchMaps = [
+//            //this is the basic version
 //            'classname of which to be modified': [
 //                    // you can use javap -s command to get the description of one method
 //                    // the adapter is a closure

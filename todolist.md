@@ -4,7 +4,6 @@
     - currently compatible with 2.0
     - first step is to be compatible with 2.+, like 2.1, 2.2
 - modify directory class input
-- apply class match wildcard, extend structure, add attr of matchmode(full,wildcard,regx)
 - modify class: provide function to add methods or constructors
 - create a new class
 - fix the exception: Error:Execution failed for task ':submodule:app:mockableAndroidJar'.
