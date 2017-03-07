@@ -21,7 +21,7 @@ public class Util {
      * @return
      */
     public static boolean wildcardMatch(String pattern, String target) {
-        String[] split = pattern.split("\\*[1-3]");
+        String[] split = pattern.split("\\*{1,3}");
         for (int i = 0; i < split.length; i++) {
             String part = split[i]
             if (part == null || part.trim().length() < 1) {
