@@ -12,17 +12,20 @@ import org.objectweb.asm.*
 public class ModifyClassUtil {
 
     public
-    static byte[] modifyClasses(String className, byte[] srcByteCode, List<Map<String, Object>> methodMatchMaps) {
+    static byte[] modifyClasses(String className, byte[] srcByteCode, Object container) {
+        List<Map<String, Object>> methodMatchMaps = getList(container);
         byte[] classBytesCode = null;
-        try {
-            Log.info("====start modifying ${className}====");
-            classBytesCode = modifyClass(srcByteCode, methodMatchMaps);
-            Log.info("====revisit modified ${className}====");
-            onlyVisitClassMethod(classBytesCode, methodMatchMaps);
-            Log.info("====finish modifying ${className}====");
-            return classBytesCode;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (methodMatchMaps) {
+            try {
+                Log.info("====start modifying ${className}====");
+                classBytesCode = modifyClass(srcByteCode, methodMatchMaps);
+                Log.info("====revisit modified ${className}====");
+                onlyVisitClassMethod(classBytesCode, methodMatchMaps);
+                Log.info("====finish modifying ${className}====");
+                return classBytesCode;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if (classBytesCode == null) {
             classBytesCode = srcByteCode;
@@ -30,6 +33,14 @@ public class ModifyClassUtil {
         return classBytesCode;
     }
 
+    static List<Map<String, Object>> getList(Object container) {
+        if (container instanceof List) {
+            return container;
+        } else if (container instanceof Map) {
+            return (List<Map<String, Object>>) container.get(Const.KEY_MODIFYMETHODS);
+        }
+        return null;
+    }
 
     private
     static byte[] modifyClass(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
@@ -120,13 +131,15 @@ public class ModifyClassUtil {
             }
             methodMatchMaps.each {
                 Map<String, Object> map ->
-                    String metName = map.get('methodName');
-                    String methodDesc = map.get('methodDesc');
-                    if (name.equals(metName)) {
-                        Closure visit = map.get('adapter');
+                    String metName = map.get(Const.KEY_METHODNAME);
+                    String metMatchType = map.get(Const.KEY_METHODMATCHTYPE);
+                    String methodDesc = map.get(Const.KEY_METHODDESC);
+                    if (Util.isPatternMatch(metName, metMatchType, name)) {
+                        Closure visit = map.get(Const.KEY_ADAPTER);
                         if (visit != null) {
+                            //methodDesc 不设置，为空，即代表对methodDesc不限制
                             if (methodDesc != null) {
-                                if (methodDesc.equals(desc)) {
+                                if (Util.isPatternMatch(methodDesc, metMatchType, desc)) {
                                     if (onlyVisit) {
                                         myMv = new MethodLogAdapter(cv.visitMethod(access, name, desc, signature, exceptions));
                                     } else {

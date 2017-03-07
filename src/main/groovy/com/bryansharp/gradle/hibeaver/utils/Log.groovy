@@ -121,7 +121,8 @@ public class Log {
         map.entrySet().each {
             entry ->
                 if ((entry.getKey().intValue() & access) > 0) {
-                    builder.append('|' + entry.getValue() + '|');
+                    //此处如果使用|作为分隔符会导致编译报错 因此改用斜杠
+                    builder.append('\\' + entry.getValue() + '/ ');
                 }
         }
         return builder.toString();
