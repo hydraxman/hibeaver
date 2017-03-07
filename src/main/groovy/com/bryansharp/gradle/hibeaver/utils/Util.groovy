@@ -18,11 +18,11 @@ public class Util {
     }
 
     public static int typeString2Int(String type) {
-        if (type == null || "full".equals(type)) {
+        if (type == null || Const.VALUE_ALL.equals(type)) {
             return Const.MT_FULL;
-        } else if ("regEx".equals(type)) {
+        } else if (Const.VALUE_REGEX.equals(type)) {
             return Const.MT_REGEX;
-        } else if ("wildcard".equals(type)) {
+        } else if (Const.VALUE_WILDCARD.equals(type)) {
             return Const.MT_WILDCARD;
         } else {
             return Const.MT_FULL;

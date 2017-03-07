@@ -37,7 +37,7 @@ public class ModifyClassUtil {
         if (container instanceof List) {
             return container;
         } else if (container instanceof Map) {
-            return (List<Map<String, Object>>) container.get("modifyMethods");
+            return (List<Map<String, Object>>) container.get(Const.KEY_MODIFYMETHODS);
         }
         return null;
     }
@@ -131,11 +131,11 @@ public class ModifyClassUtil {
             }
             methodMatchMaps.each {
                 Map<String, Object> map ->
-                    String metName = map.get('methodName');
-                    String metMatchType = map.get('methodMatchType');
-                    String methodDesc = map.get('methodDesc');
+                    String metName = map.get(Const.KEY_METHODNAME);
+                    String metMatchType = map.get(Const.KEY_METHODMATCHTYPE);
+                    String methodDesc = map.get(Const.KEY_METHODDESC);
                     if (Util.isPatternMatch(metName, metMatchType, name)) {
-                        Closure visit = map.get('adapter');
+                        Closure visit = map.get(Const.KEY_ADAPTER);
                         if (visit != null) {
                             //methodDesc 不设置，为空，即代表对methodDesc不限制
                             if (methodDesc != null) {

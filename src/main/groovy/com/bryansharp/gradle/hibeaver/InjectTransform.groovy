@@ -78,7 +78,7 @@ public class InjectTransform extends Transform {
                 if (value) {
                     int type;
                     if (value instanceof Map) {
-                        type = Util.typeString2Int(value.get("classMatchType"));
+                        type = Util.typeString2Int(value.get(Const.KEY_CLASSMATCHTYPE));
                     } else {
                         type = Const.MT_FULL;
                     }
