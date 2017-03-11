@@ -12,7 +12,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 该插件已经上传到Jcenter,可直接引用如下：
 
-    classpath 'com.bryansharp:HiBeaver:1.2.3'
+    classpath 'com.bryansharp:HiBeaver:1.2.4'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
@@ -22,97 +22,58 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
     import org.objectweb.asm.ClassVisitor
     import org.objectweb.asm.MethodVisitor
     import org.objectweb.asm.Opcodes
-    //或者通过下面这行统一引入
+    //or you can import like bellow:
     //import org.objectweb.asm.*
     hiBeaver {
-        //下面这个参数仅仅影响log输出，为本次修改命名，无实际意义
+        //this will determine the name of this hibeaver transform, no practical use.
         hiBeaverModifyName = 'myHibeaverTest'
-        //设置为true可以显示帮助内容，默认为true
+        //turn this on to make it print help content, default value is true
         showHelp = true
-        //keepQuiet默认为false,为true时不会有字节码修改的log输出，建议为false
+        //this flag will decide whether the log of the modifying process be printed or not, default value is false
         keepQuiet = false
-        //下面的参数设置为true时会输出工程编译耗时信息
+        //this is a kit feature of the plugin, set it true to see the time consume of this build
         watchTimeConsume = false
-
-        //重头戏是配置下面的参数：modifyMatchMaps
-        //基础配置结构形如： ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
-        //高级配置结构形如: 
-        //[
-        //   'classMatchPattern':
-        //     [
-        //        'classMatchType':'wildcard',
-        //        'modifyMethods':[ [:], [:] ]
-        //     ]
-        //     ,
-        //   'classMatchPattern':
-        //     [
-        //        'classMatchType':'regEx',
-        //        'modifyMethods':[ [:], [:] ]
-        //     ]
-        //]
+    
+        //this is the most important part
+        //basic structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
         modifyMatchMaps = [
-                //this is the basic version
-                'classname of which to be modified': [
-                        // 用javap -s 命令来查看类中方法的description
-                        // adapter 的值为一个closure
-                        ['methodName': 'the name of the method', 'methodDesc': 'javap -s to get the description', 'adapter': {
-                            //以下closure中的参数不可以改变顺序，缺一不可
+                //此处可以进行模糊匹配，!表示排除，!android*即表示排除掉android开头的全类名。
+                //|符号不完全表示或，而仅仅是匹配的分隔符。*表示任意长度（>0）的任意字符
+                '*Activity|*Receiver|!android*'             : [
+                        //methodDesc设置为空代表对methodDesc不进行限制
+                        //方法名也可以用模糊匹配
+                        ['methodName': 'on**', 'methodDesc': null, 'adapter': {
                             ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                //return null to modify nothing
-                                return null;
-                        }]
-                        ,
-                        ['methodName': 'the name of the method2', 'methodDesc': 'javap -s to get the description', 'adapter': {
-                            ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                return null;
+                                MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
+                                MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
+                                    @Override
+                                    void visitCode() {
+                                        super.visitCode();
+                                        methodVisitor.visitLdcInsn(desc);
+                                        methodVisitor.visitLdcInsn(name);
+                                      //下面这行为要调用的方法，请酌情修改
+                                        methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, 
+                                            "bruce/com/testhibeaver/MainActivity", 
+                                                "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
+                                    }
+                                }
+                                return adapter;
                         }]
                 ]
                 ,
-                //高级配置，可以设置类的批量匹配
-                '*Activity'                       : [
-                        //匹配规则为三种类型之一: all,regEx,wildcard
-                        //默认是all
-                        //wildcard匹配仅支持*通配符，*代表任意长度（>0）的任意字符
-                        'classMatchType': 'wildcard',
-                        'modifyMethods' : [
-                                //methodMatchType会同时对methodName和methodDesc的匹配生效
-                                //methodDesc设置为空代表对methodDesc不进行限制
-                                ['methodName': 'on**', 'methodMatchType': 'wildcard', 'methodDesc': null, 'adapter': {
-                                    ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                        MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-                                        MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-                                            @Override
-                                            void visitCode() {
-                                                super.visitCode();
-                                                methodVisitor.visitLdcInsn(desc);
-                                                methodVisitor.visitLdcInsn(name);
-                                                methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-                                            }
-                                        }
-                                        return adapter;
-                                }]
-                        ]
-                ]
-                ,
-                //regEx即正则表达式匹配
-                '.*D[a-zA-Z]*Receiver'                       : [
-                        'classMatchType': 'regEx',
-                        'modifyMethods' : [
-                                ['methodName': 'on**', 'methodMatchType': 'wildcard', 'methodDesc': null, 'adapter': {
-                                    ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-                                        MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-                                        MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-                                            @Override
-                                            void visitCode() {
-                                                super.visitCode();
-                                                methodVisitor.visitLdcInsn(desc);
-                                                methodVisitor.visitLdcInsn(name);
-                                                methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-                                            }
-                                        }
-                                        return adapter;
-                                }]
-                        ]
+                //此处以r:开头，代表正则表达式匹配模式
+                'r:.*D[a-zA-Z]*Client'              : [
+                        ['methodName': 'on**', 'methodDesc': null, 'adapter': {
+                            ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
+                                MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
+                                MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
+                                    @Override
+                                    void visitCode() {
+                                        super.visitCode();
+                                    }
+                                }
+                                return adapter;
+                        }]
                 ]
         ]
     }

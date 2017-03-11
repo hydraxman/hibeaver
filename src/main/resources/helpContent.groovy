@@ -24,7 +24,6 @@
 //
 //    //this is the most important part
 //    //basic structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
-//    //advanced structure is like: ['classMatchPattern':['classMatchType':'wildcard','modifyMethods':[[:],[:]]],'classMatchPattern':['classMatchType':'regEx','modifyMethods':[[:],[:]]]]
 //    modifyMatchMaps = [
 //            //this is the basic version
 //            'classname of which to be modified': [
@@ -44,48 +43,43 @@
 //            ]
 //            ,
 //            //the latter ones are advanced cases
-//            '*Activity'                       : [
-//                    //the value of classMatchType can either be one of the three: all,regEx,wildcard
-//                    //default value is all
-//                    'classMatchType': 'wildcard',
-//                    'modifyMethods' : [
-//                            //methodMatchType会同时对methodName和methodDesc的匹配生效
-//                            //methodDesc设置为空代表对methodDesc不进行限制
-//                            ['methodName': 'on**', 'methodMatchType': 'wildcard', 'methodDesc': null, 'adapter': {
-//                                ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                                    MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-//                                    MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-//                                        @Override
-//                                        void visitCode() {
-//                                            super.visitCode();
-//                                            methodVisitor.visitLdcInsn(desc);
-//                                            methodVisitor.visitLdcInsn(name);
-//                                            methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-//                                        }
-//                                    }
-//                                    return adapter;
-//                            }]
-//                    ]
+//            //此处可以进行模糊匹配，!表示排除，!android*即表示排除掉android开头的全类名。
+//            //|符号不完全表示或，而仅仅是匹配的分隔符。*表示任意长度（>0）的任意字符
+//            '*Activity|*Receiver|!android*'             : [
+//                    //methodDesc设置为空代表对methodDesc不进行限制
+//                    //方法名也可以用模糊匹配
+//                    ['methodName': 'on**', 'methodDesc': null, 'adapter': {
+//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
+//                            MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
+//                            MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
+//                                @Override
+//                                void visitCode() {
+//                                    super.visitCode();
+//                                    methodVisitor.visitLdcInsn(desc);
+//                                    methodVisitor.visitLdcInsn(name);
+//                                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
+//                                }
+//                            }
+//                            return adapter;
+//                    }]
 //            ]
 //            ,
-//            '.*D[a-zA-Z]*Receiver'                       : [
-//                    'classMatchType': 'regEx',
-//                    'modifyMethods' : [
-//                            ['methodName': 'on**', 'methodMatchType': 'wildcard', 'methodDesc': null, 'adapter': {
-//                                ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                                    MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-//                                    MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-//                                        @Override
-//                                        void visitCode() {
-//                                            super.visitCode();
-//                                            methodVisitor.visitLdcInsn(desc);
-//                                            methodVisitor.visitLdcInsn(name);
-//                                            methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-//                                        }
-//                                    }
-//                                    return adapter;
-//                            }]
-//                    ]
+//            //此处以r:开头，代表正则表达式匹配模式
+//            'r:.*D[a-zA-Z]*Client'              : [
+//                    ['methodName': 'on**', 'methodDesc': null, 'adapter': {
+//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
+//                            MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
+//                            MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
+//                                @Override
+//                                void visitCode() {
+//                                    super.visitCode();
+//                                    methodVisitor.visitLdcInsn(desc);
+//                                    methodVisitor.visitLdcInsn(name);
+//                                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
+//                                }
+//                            }
+//                            return adapter;
+//                    }]
 //            ]
 //    ]
 //}
