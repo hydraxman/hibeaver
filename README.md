@@ -10,7 +10,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 ###快速上手
 
-该插件已经上传到Jcenter,可直接引用如下：
+该插件已经上传到Jcenter,可直接引用最新版本如下：
 
     classpath 'com.bryansharp:HiBeaver:1.2.4'
 
@@ -25,23 +25,23 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
     //or you can import like bellow:
     //import org.objectweb.asm.*
     hiBeaver {
-        //this will determine the name of this hibeaver transform, no practical use.
+        //下面这个参数仅仅影响log输出，为本次修改命名，无实际意义，不配置也可以
         hiBeaverModifyName = 'myHibeaverTest'
-        //turn this on to make it print help content, default value is true
+        //设置为true可以显示帮助内容，默认为true
         showHelp = true
-        //this flag will decide whether the log of the modifying process be printed or not, default value is false
+        //keepQuiet默认为false,为true时不会有字节码修改的log输出，建议为false
         keepQuiet = false
-        //this is a kit feature of the plugin, set it true to see the time consume of this build
+        //下面的参数设置为true时会输出工程编译耗时信息
         watchTimeConsume = false
     
-        //this is the most important part
-        //basic structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
+        //重头戏是配置下面的参数：modifyMatchMaps
+        //基础配置结构形如： ['class':[[:],[:]],'class':[[:],[:]]], 类型是 Map<String, List<Map<String, Object>>>
         modifyMatchMaps = [
                 //此处可以进行模糊匹配，!表示排除，!android*即表示排除掉android开头的全类名。
                 //|符号不完全表示或，而仅仅是匹配的分隔符。*表示任意长度（>0）的任意字符
                 '*Activity|*Receiver|!android*'             : [
                         //methodDesc设置为空代表对methodDesc不进行限制
-                        //方法名也可以用模糊匹配
+                        //方法名也可以用模糊匹配 用javap -s 命令来查看类中方法的description
                         ['methodName': 'on**', 'methodDesc': null, 'adapter': {
                             ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
                                 MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
@@ -51,7 +51,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
                                         super.visitCode();
                                         methodVisitor.visitLdcInsn(desc);
                                         methodVisitor.visitLdcInsn(name);
-                                      //下面这行为要调用的方法，请酌情修改
+                                      //下面这行代码 为要调用的方法，请酌情修改
                                         methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, 
                                             "bruce/com/testhibeaver/MainActivity", 
                                                 "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
