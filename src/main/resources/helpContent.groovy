@@ -6,5 +6,5 @@
 //          欢迎访问 https://github.com/BryanSharp/hibeaver 留下建议
 //           Hope you enjoy!
 //
-// author BryanSharp bsp0911932@163.com
+// Author BryanSharp bsp0911932@163.com
 ///////////////////// - HiBeaver Help Content END - /////////////////////////////
