@@ -4,7 +4,7 @@
 
 ###简介
 
-HiBeaver是一个Android轻量级AOP的Gradle插件。结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段，依据使用者的配置，对工程内所包含的Java字节码进行修改，从而支持使用者仅通过Gradle配置对字节码进行代码注入和AOP设计，或对项目依赖的Jar包内的代码增加Hook节点。
+HiBeaver是一个用于进行Android字节码插桩的Gradle插件，可以用来实现Android轻量级AOP设计。结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段，依据使用者的配置，对工程内所包含的Java字节码进行修改，从而支持使用者仅通过Gradle配置对字节码进行代码注入和AOP设计，或对项目依赖的Jar包内的代码增加Hook节点。
 
 Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和装修大坝的可爱小动物。河狸的堤坝虽说不上像三峡那样“高峡出平湖”，却也为自然和生态做出了暖男般的贡献。
 
