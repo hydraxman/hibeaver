@@ -14,7 +14,7 @@ public class Util {
         if (isEmpty(pattern) || isEmpty(target)) {
             return false;
         }
-        if (pattern.startsWith("r:")) {
+        if (pattern.startsWith(Const.REGEX_STARTER)) {
             pattern = pattern.substring(2);
         }
         return Pattern.matches(pattern, target);
@@ -35,7 +35,7 @@ public class Util {
     public static int getMatchTypeByValue(String value) {
         if (isEmpty(value)) {
             throw new RuntimeException("Key cannot be null");
-        } else if (value.startsWith("r:")) {
+        } else if (value.startsWith(Const.REGEX_STARTER)) {
             return Const.MT_REGEX;
         } else if (value.contains("*") || value.contains("|")) {
             return Const.MT_WILDCARD;

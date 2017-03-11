@@ -19,4 +19,5 @@ public interface Const {
     String VALUE_ALL="all";
     String WILDCARD_STAR = "\\*{1,3}";
     String WILDCARD_VLINE = "\\|{1,2}";
+    String REGEX_STARTER = "r:";
 }
