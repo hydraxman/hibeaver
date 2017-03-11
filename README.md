@@ -12,7 +12,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 该插件已经上传到Jcenter,可直接引用如下：
 
-    classpath 'com.bryansharp:HiBeaver:1.2.3'
+    classpath 'com.bryansharp:hibeaver:1.2.3'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
