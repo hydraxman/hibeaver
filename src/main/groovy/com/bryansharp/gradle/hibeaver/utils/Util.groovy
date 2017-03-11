@@ -14,6 +14,9 @@ public class Util {
         if (isEmpty(pattern) || isEmpty(target)) {
             return false;
         }
+        if (pattern.startsWith("r:")) {
+            pattern = pattern.substring(2);
+        }
         return Pattern.matches(pattern, target);
     }
 
@@ -29,11 +32,28 @@ public class Util {
         }
     }
 
+    public static int getMatchTypeByValue(String value) {
+        if (isEmpty(value)) {
+            throw new RuntimeException("Key cannot be null");
+        } else if (value.startsWith("r:")) {
+            return Const.MT_REGEX;
+        } else if (value.contains("*") || value.contains("|")) {
+            return Const.MT_WILDCARD;
+        } else {
+            return Const.MT_FULL;
+        }
+    }
+
     public static boolean isPatternMatch(String pattern, String type, String target) {
         if (isEmpty(pattern) || isEmpty(target)) {
             return false;
         }
-        int intType = typeString2Int(type);
+        int intType;
+        if (isEmpty(type)) {
+            intType = getMatchTypeByValue(pattern);
+        } else {
+            intType = typeString2Int(type);
+        }
         switch (intType) {
             case Const.MT_FULL:
                 if (target.equals(pattern)) {
@@ -46,7 +66,7 @@ public class Util {
                 }
                 break;
             case Const.MT_WILDCARD:
-                if (wildcardMatch(pattern, target)) {
+                if (wildcardMatchPro(pattern, target)) {
                     return true;
                 }
                 break;
@@ -60,6 +80,37 @@ public class Util {
 
     public static boolean isNotEmpty(String text) {
         return !isEmpty(text);
+    }
+
+    public static boolean wildcardMatchPro(String pattern, String target) {
+        if (pattern.contains("|")) {
+            String[] patterns = pattern.split(Const.WILDCARD_VLINE);
+            String part;
+            for (int i = 0; i < patterns.length; i++) {
+                part = patterns[i];
+                if (isNotEmpty(part)) {
+                    if (part.startsWith("!")) {
+                        part = part.substring(1);
+                        if (wildcardMatch(part, target)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < patterns.length; i++) {
+                part = patterns[i]
+                if (isNotEmpty(part)) {
+                    if (!part.startsWith("!")) {
+                        if (wildcardMatch(part, target)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        } else {
+            return wildcardMatch(pattern, target);
+        }
     }
     /**
      * 星号匹配
@@ -77,12 +128,12 @@ public class Util {
      .append(wildcardMatch("com.**.act.*.gi*ub.*Act*vity", "com.jj.act.jj.github.Mactivity")).append(",")//false
      .toString()
      */
-    public static boolean wildcardMatch(String pattern, String target) {
+    private static boolean wildcardMatch(String pattern, String target) {
         if (isEmpty(pattern) || isEmpty(target)) {
             return false;
         }
         try {
-            String[] split = pattern.split("\\*{1,3}");
+            String[] split = pattern.split(Const.WILDCARD_STAR);
             //如果以分隔符开头和结尾，第一位会为空字符串，最后一位不会为空字符，所以*Activity和*Activity*的分割结果一样
             if (pattern.endsWith("*")) {//因此需要在结尾拼接一个空字符
                 List<String> strings = new LinkedList<>(Arrays.asList(split));
