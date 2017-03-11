@@ -1,88 +1,9 @@
 ////////////////////// - HiBeaver Help Content(UTF-8) - /////////////////////////////
-//          A HiBeaver plugin setup case is shown as below
-//          You can copy-paste them entirely and de-comment them as an initial setup
-//          You can turn Help Content output off by setting the showHelp flag false
-//          hi, 这里是HiBeaver帮助内容，你可以直接把这整个内容复制到build.gradle中，然后解除注释作为初始设置
-//          如果嫌烦可以在下面配置showHelp = false 来关闭这个帮助内容的输出
-//          hiBeaver现在支持轻量级AOP配置，欢迎尝鲜
-//
-//import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
-//import org.objectweb.asm.ClassVisitor
-//import org.objectweb.asm.MethodVisitor
-//import org.objectweb.asm.Opcodes
-////or you can import like bellow:
-////import org.objectweb.asm.*
-//hiBeaver {
-//    //this will determine the name of this hibeaver transform, no practical use.
-//    hiBeaverModifyName = 'myHibeaverTest'
-//    //turn this on to make it print help content, default value is true
-//    showHelp = true
-//    //this flag will decide whether the log of the modifying process be printed or not, default value is false
-//    keepQuiet = false
-//    //this is a kit feature of the plugin, set it true to see the time consume of this build
-//    watchTimeConsume = false
-//
-//    //this is the most important part
-//    //basic structure is like ['class':[[:],[:]],'class':[[:],[:]]], type is Map<String, List<Map<String, Object>>>
-//    modifyMatchMaps = [
-//            //this is the basic version
-//            'classname of which to be modified': [
-//                    // you can use javap -s command to get the description of one method
-//                    // the adapter is a closure
-//                    ['methodName': 'the name of the method', 'methodDesc': 'javap -s to get the description', 'adapter': {
-//                        //the below args cannot be changed, to copy them entirely with nothing changed is recommended
-//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                            //return null to modify nothing
-//                            return null;
-//                    }]
-//                    ,
-//                    ['methodName': 'the name of the method2', 'methodDesc': 'javap -s to get the description', 'adapter': {
-//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                            return null;
-//                    }]
-//            ]
-//            ,
-//            //the latter ones are advanced cases
-//            //此处可以进行模糊匹配，!表示排除，!android*即表示排除掉android开头的全类名。
-//            //|符号不完全表示或，而仅仅是匹配的分隔符。*表示任意长度（>0）的任意字符
-//            '*Activity|*Receiver|!android*'             : [
-//                    //methodDesc设置为空代表对methodDesc不进行限制
-//                    //方法名也可以用模糊匹配
-//                    ['methodName': 'on**', 'methodDesc': null, 'adapter': {
-//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                            MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-//                            MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-//                                @Override
-//                                void visitCode() {
-//                                    super.visitCode();
-//                                    methodVisitor.visitLdcInsn(desc);
-//                                    methodVisitor.visitLdcInsn(name);
-//                                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-//                                }
-//                            }
-//                            return adapter;
-//                    }]
-//            ]
-//            ,
-//            //此处以r:开头，代表正则表达式匹配模式
-//            'r:.*D[a-zA-Z]*Client'              : [
-//                    ['methodName': 'on**', 'methodDesc': null, 'adapter': {
-//                        ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions ->
-//                            MethodVisitor methodVisitor = cv.visitMethod(access, name, desc, signature, exceptions);
-//                            MethodVisitor adapter = new MethodLogAdapter(methodVisitor) {
-//                                @Override
-//                                void visitCode() {
-//                                    super.visitCode();
-//                                    methodVisitor.visitLdcInsn(desc);
-//                                    methodVisitor.visitLdcInsn(name);
-//                                    methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "bruce/com/testhibeaver/MainActivity", "hookXM", "(Ljava/lang/Object;Ljava/lang/Object;)V");
-//                                }
-//                            }
-//                            return adapter;
-//                    }]
-//            ]
-//    ]
-//}
+//          You can turn this output off by setting the showHelp flag false
+//          Any question or suggestion please visit https://github.com/BryanSharp/hibeaver
+//              to leave a comment, open an issue or check the README there
+//          在gradle中配置showHelp = false 来关闭这个帮助内容的输出
+//          欢迎访问 https://github.com/BryanSharp/hibeaver 留下建议
 //
 // author BryanSharp bsp0911932@163.com
 ///////////////////// - HiBeaver Help Content END - /////////////////////////////
