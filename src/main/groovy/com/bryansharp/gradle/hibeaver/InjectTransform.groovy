@@ -73,14 +73,14 @@ public class InjectTransform extends Transform {
         Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
         if (modifyMatchMaps != null) {
             def set = modifyMatchMaps.entrySet();
-            for (Map.Entry<String, Map<String, Object>> entry : set) {
+            for (Map.Entry<String, Object> entry : set) {
                 def value = entry.getValue()
                 if (value) {
                     int type;
                     if (value instanceof Map) {
                         type = Util.typeString2Int(value.get(Const.KEY_CLASSMATCHTYPE));
                     } else {
-                        type = Const.MT_FULL;
+                        type = Util.getMatchTypeByValue(entry.getKey());
                     }
                     targetClasses.put(entry.getKey(), type)
                 }
@@ -198,7 +198,7 @@ public class InjectTransform extends Transform {
                         }
                         break;
                     case Const.MT_WILDCARD:
-                        if (Util.wildcardMatch(key, className)) {
+                        if (Util.wildcardMatchPro(key, className)) {
                             return key;
                         }
                         break;
