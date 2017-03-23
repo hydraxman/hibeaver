@@ -5,11 +5,7 @@ import com.android.annotations.Nullable
 import com.android.build.api.transform.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.bryansharp.gradle.hibeaver.utils.Const
-import com.bryansharp.gradle.hibeaver.utils.DataHelper
-import com.bryansharp.gradle.hibeaver.utils.Log
-import com.bryansharp.gradle.hibeaver.utils.ModifyClassUtil
-import com.bryansharp.gradle.hibeaver.utils.Util
+import com.bryansharp.gradle.hibeaver.utils.*
 import groovy.io.FileType
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
@@ -18,8 +14,6 @@ import org.gradle.api.Project
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.jar.JarOutputStream
-import java.util.zip.ZipEntry
 
 /**
  * Created by bryansharp(bsp0911932@163.com) on 2016/5/7.
@@ -217,47 +211,9 @@ public class InjectTransform extends Transform {
      */
     public static File modifyJarFile(File jarFile, File tempDir) {
         if (jarFile) {
-            /** 设置输出到的jar */
-            def hexName = DigestUtils.md5Hex(jarFile.absolutePath).substring(0, 8);
-            def optJar = new File(tempDir, hexName + jarFile.name)
-            JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(optJar));
-            /**
-             * 读取原jar
-             */
-            def file = new JarFile(jarFile);
             Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps
-            Enumeration enumeration = file.entries();
-            while (enumeration.hasMoreElements()) {
-                JarEntry jarEntry = (JarEntry) enumeration.nextElement();
-                InputStream inputStream = file.getInputStream(jarEntry);
+            return ModifyFiles.modifyJar(jarFile, modifyMatchMaps, tempDir)
 
-                String entryName = jarEntry.getName();
-                String className
-
-                ZipEntry zipEntry = new ZipEntry(entryName);
-
-                jarOutputStream.putNextEntry(zipEntry);
-
-                byte[] modifiedClassBytes = null;
-                byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
-                if (entryName.endsWith(".class")) {
-                    className = path2Classname(entryName)
-                    String key = shouldModifyClass(className)
-                    if (modifyMatchMaps != null && key != null) {
-                        modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
-                    }
-                }
-                if (modifiedClassBytes == null) {
-                    jarOutputStream.write(sourceClassBytes);
-                } else {
-                    jarOutputStream.write(modifiedClassBytes);
-                }
-                jarOutputStream.closeEntry();
-            }
-//            Log.info("${hexName} is modified");
-            jarOutputStream.close();
-            file.close();
-            return optJar;
         }
         return null;
     }

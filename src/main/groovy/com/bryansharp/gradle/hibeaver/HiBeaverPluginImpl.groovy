@@ -3,6 +3,7 @@ package com.bryansharp.gradle.hibeaver
 import com.android.build.gradle.BaseExtension
 import com.bryansharp.gradle.hibeaver.utils.DataHelper
 import com.bryansharp.gradle.hibeaver.utils.Log
+import com.bryansharp.gradle.hibeaver.utils.ModifyFiles
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -17,6 +18,10 @@ class HiBeaverPluginImpl implements Plugin<Project> {
             Log.setQuiet(project.hiBeaver.keepQuiet);
             Log.setShowHelp(project.hiBeaver.showHelp);
             Log.logHelp();
+            Map<String, Map<String, Object>> taskMap = project.hibeaver.modifyTasks;
+            if (taskMap != null && taskMap.size() > 0) {
+                generateTasks(project, taskMap);
+            }
             if (project.hiBeaver.watchTimeConsume) {
                 Log.info "watchTimeConsume enabled"
                 project.gradle.addListener(new TimeListener())
@@ -38,6 +43,14 @@ class HiBeaverPluginImpl implements Plugin<Project> {
         if (!hiBeaverDir.exists()) {
             hiBeaverDir.mkdir()
         }
+        File tempDir = new File(hiBeaverDir, "temp")
         DataHelper.ext.hiBeaverDir = hiBeaverDir
+        DataHelper.ext.hiBeaverTempDir = tempDir
+    }
+
+    def generateTasks(Project project, Map<String, Map<String, Object>> taskMap) {
+        project.task("hibeaverModifyFiles") << {
+            ModifyFiles.modify(taskMap)
+        }
     }
 }
