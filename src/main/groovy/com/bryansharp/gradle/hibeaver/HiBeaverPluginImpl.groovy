@@ -4,6 +4,7 @@ import com.android.build.gradle.BaseExtension
 import com.bryansharp.gradle.hibeaver.utils.DataHelper
 import com.bryansharp.gradle.hibeaver.utils.Log
 import com.bryansharp.gradle.hibeaver.utils.ModifyFiles
+import com.bryansharp.gradle.hibeaver.utils.Util
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -12,13 +13,14 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     void apply(Project project) {
         println ":applied HiBeaver"
         project.extensions.create('hiBeaver', HiBeaverParams)
+        Util.setProject(project)
         registerTransform(project)
         initDir(project);
         project.afterEvaluate {
             Log.setQuiet(project.hiBeaver.keepQuiet);
             Log.setShowHelp(project.hiBeaver.showHelp);
             Log.logHelp();
-            Map<String, Map<String, Object>> taskMap = project.hibeaver.modifyTasks;
+            Map<String, Map<String, Object>> taskMap = project.hiBeaver.modifyTasks;
             if (taskMap != null && taskMap.size() > 0) {
                 generateTasks(project, taskMap);
             }
@@ -34,7 +36,7 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     def static registerTransform(Project project) {
 //        def isApp = project.plugins.hasPlugin("com.android.application")
         BaseExtension android = project.extensions.getByType(BaseExtension)
-        InjectTransform transform = new InjectTransform(project)
+        InjectTransform transform = new InjectTransform()
         android.registerTransform(transform)
     }
 
@@ -44,11 +46,14 @@ class HiBeaverPluginImpl implements Plugin<Project> {
             hiBeaverDir.mkdir()
         }
         File tempDir = new File(hiBeaverDir, "temp")
+        if (!tempDir.exists()) {
+            tempDir.mkdir()
+        }
         DataHelper.ext.hiBeaverDir = hiBeaverDir
         DataHelper.ext.hiBeaverTempDir = tempDir
     }
 
-    def generateTasks(Project project, Map<String, Map<String, Object>> taskMap) {
+    def static generateTasks(Project project, Map<String, Map<String, Object>> taskMap) {
         project.task("hibeaverModifyFiles") << {
             ModifyFiles.modify(taskMap)
         }

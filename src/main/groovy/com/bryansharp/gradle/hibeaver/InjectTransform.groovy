@@ -3,14 +3,12 @@ package com.bryansharp.gradle.hibeaver
 import com.android.annotations.NonNull
 import com.android.annotations.Nullable
 import com.android.build.api.transform.*
-import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.bryansharp.gradle.hibeaver.utils.*
 import groovy.io.FileType
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
-import org.gradle.api.Project
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -23,14 +21,6 @@ import java.util.jar.JarFile
  *         introduction:
  */
 public class InjectTransform extends Transform {
-
-    static AppExtension android
-    static Map<String, Integer> targetClasses = [:];
-    private static Project project;
-
-    public InjectTransform(Project project) {
-        InjectTransform.project = project
-    }
 
     @Override
     String getName() {
@@ -59,27 +49,11 @@ public class InjectTransform extends Transform {
             @NonNull Collection<TransformInput> referencedInputs,
             @Nullable TransformOutputProvider outputProvider,
             boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        Log.info "==============hiBeaver ${project.hiBeaver.hiBeaverModifyName + ' '}transform enter=============="
-        android = project.extensions.getByType(AppExtension)
+        Log.info "==============hiBeaver ${Util.getHiBeaver().hiBeaverModifyName + ' '}transform enter=============="
 //        String flavorAndBuildType = context.name.split("For")[1]
 //        Log.info("flavorAndBuildType ${flavorAndBuildType}")
-        targetClasses = [:];
-        Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps;
-        if (modifyMatchMaps != null) {
-            def set = modifyMatchMaps.entrySet();
-            for (Map.Entry<String, Object> entry : set) {
-                def value = entry.getValue()
-                if (value) {
-                    int type;
-                    if (value instanceof Map) {
-                        type = Util.typeString2Int(value.get(Const.KEY_CLASSMATCHTYPE));
-                    } else {
-                        type = Util.getMatchTypeByValue(entry.getKey());
-                    }
-                    targetClasses.put(entry.getKey(), type)
-                }
-            }
-        }
+        Map<String, Object> modifyMatchMaps = Util.getHiBeaver().modifyMatchMaps;
+        Util.initTargetClasses(modifyMatchMaps)
         /**
          * 获取所有依赖的classPaths,仅做备用
          */
@@ -100,7 +74,7 @@ public class InjectTransform extends Transform {
             }
         }
 
-        def paths = [android.bootClasspath.get(0).absolutePath/*, injectClassPath*/]
+        def paths = [Util.getExtension().bootClasspath.get(0).absolutePath/*, injectClassPath*/]
         paths.addAll(classPaths)
         /**遍历输入文件*/
         inputs.each { TransformInput input ->
@@ -174,36 +148,6 @@ public class InjectTransform extends Transform {
         FileUtils.copyFile(optJar, checkJarFile);
     }
 
-    static String shouldModifyClass(String className) {
-        if (project.hiBeaver.enableModify) {
-            def set = targetClasses.entrySet();
-            for (Map.Entry<String, Integer> entry : set) {
-                def mt = entry.getValue();
-                String key = entry.getKey()
-                switch (mt) {
-                    case Const.MT_FULL:
-                        if (className.equals(key)) {
-                            return key;
-                        }
-                        break;
-                    case Const.MT_REGEX:
-                        if (Util.regMatch(key, className)) {
-                            return key;
-                        }
-                        break;
-                    case Const.MT_WILDCARD:
-                        if (Util.wildcardMatchPro(key, className)) {
-                            return key;
-                        }
-                        break;
-                }
-            }
-            return null;
-        } else {
-            return null;
-        }
-    }
-
     /**
      * 植入代码
      * @param buildDir 是项目的build class目录,就是我们需要注入的class所在地
@@ -211,24 +155,21 @@ public class InjectTransform extends Transform {
      */
     public static File modifyJarFile(File jarFile, File tempDir) {
         if (jarFile) {
-            Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps
-            return ModifyFiles.modifyJar(jarFile, modifyMatchMaps, tempDir)
+            Map<String, Object> modifyMatchMaps = Util.getHiBeaver().modifyMatchMaps
+            return ModifyFiles.modifyJar(jarFile, modifyMatchMaps, tempDir, true)
 
         }
         return null;
     }
 
-    private static String path2Classname(String entryName) {
-        entryName.replace(File.separator, ".").replace(".class", "")
-    }
 
     public static File modifyClassFile(File dir, File classFile, File tempDir) {
         File modified;
         try {
-            String className = path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
-            Map<String, Object> modifyMatchMaps = project.hiBeaver.modifyMatchMaps
+            String className = Util.path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
+            Map<String, Object> modifyMatchMaps = Util.getHiBeaver().modifyMatchMaps
             byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
-            String key = shouldModifyClass(className)
+            String key = Util.shouldModifyClass(className)
             if (key != null) {
                 byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
                 if (modifiedClassBytes) {
@@ -252,7 +193,7 @@ public class InjectTransform extends Transform {
      */
     public static boolean isJarNeedModify(File jarFile) {
         boolean modified = false;
-        if (targetClasses != null && targetClasses.size() > 0) {
+        if (Util.isTargetClassesNotEmpty()) {
             if (jarFile) {
                 /**
                  * 读取原jar
@@ -265,7 +206,7 @@ public class InjectTransform extends Transform {
                     String className
                     if (entryName.endsWith(".class")) {
                         className = entryName.replace("/", ".").replace(".class", "")
-                        if (shouldModifyClass(className) != null) {
+                        if (Util.shouldModifyClass(className) != null) {
                             modified = true;
                         }
                     }

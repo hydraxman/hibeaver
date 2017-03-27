@@ -45,7 +45,7 @@ public class ModifyClassUtil {
     private
     static byte[] modifyClass(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassAdapter adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
+        ClassVisitor adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
         ClassReader cr = new ClassReader(srcClass);
         cr.accept(adapter, ClassReader.SKIP_DEBUG);
         return classWriter.toByteArray();
@@ -60,14 +60,14 @@ public class ModifyClassUtil {
         cr.accept(adapter, ClassReader.SKIP_DEBUG);
     }
 
-    static class MethodFilterClassAdapter extends ClassAdapter implements Opcodes {
+    static class MethodFilterClassAdapter extends ClassVisitor implements Opcodes {
 //        private String className;
         private List<Map<String, Object>> methodMatchMaps;
         public boolean onlyVisit = false;
 
         public MethodFilterClassAdapter(
                 final ClassVisitor cv, List<Map<String, Object>> methodMatchMaps) {
-            super(cv);
+            super(Opcodes.ASM4, cv);
 //            this.className = className;
             this.methodMatchMaps = methodMatchMaps;
         }

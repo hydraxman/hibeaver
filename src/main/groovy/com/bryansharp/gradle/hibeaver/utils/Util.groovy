@@ -1,5 +1,9 @@
 package com.bryansharp.gradle.hibeaver.utils
 
+import com.android.build.gradle.BaseExtension
+import com.bryansharp.gradle.hibeaver.HiBeaverParams
+import org.gradle.api.Project
+
 import java.util.regex.Pattern
 
 /**
@@ -10,6 +14,45 @@ import java.util.regex.Pattern
  * introduction:
  */
 public class Util {
+
+
+    private static Project project;
+
+    public static void setProject(Project project) {
+        Util.@project = project
+    }
+
+    public static Project getProject() {
+        return project
+    }
+
+    public static BaseExtension getExtension() {
+        return project.extensions.getByType(BaseExtension)
+    }
+
+    public static HiBeaverParams getHiBeaver() {
+        return project.hiBeaver
+    }
+
+    public static void initTargetClasses(Map<String, Object> modifyMatchMaps) {
+        targetClasses.clear()
+        if (modifyMatchMaps != null) {
+            def set = modifyMatchMaps.entrySet();
+            for (Map.Entry<String, Object> entry : set) {
+                def value = entry.getValue()
+                if (value) {
+                    int type;
+                    if (value instanceof Map) {
+                        type = typeString2Int(value.get(Const.KEY_CLASSMATCHTYPE));
+                    } else {
+                        type = getMatchTypeByValue(entry.getKey());
+                    }
+                    targetClasses.put(entry.getKey(), type)
+                }
+            }
+        }
+    }
+
     public static boolean regMatch(String pattern, String target) {
         if (isEmpty(pattern) || isEmpty(target)) {
             return false;
@@ -177,5 +220,58 @@ public class Util {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static String path2Classname(String entryName) {
+        entryName.replace(File.separator, ".").replace(".class", "")
+    }
+
+    public static String getNameFromPath(String path) {
+        path.substring(path.lastIndexOf(File.separator) + 1)
+    }
+    /**
+     * turn "com.bryansharp.util" to "com/bryansharp/util"
+     *
+     * @param classname full class name
+     * @return class path
+     */
+    public static String className2Path(String classname) {
+        return classname.replace('.', '/');
+    }
+
+    static Map<String, Integer> targetClasses = [:];
+
+    public static boolean isTargetClassesNotEmpty() {
+        targetClasses != null && targetClasses.size() > 0
+    }
+
+    public static String shouldModifyClass(String className) {
+        if (getHiBeaver().enableModify) {
+            def set = targetClasses.entrySet();
+            for (Map.Entry<String, Integer> entry : set) {
+                def mt = entry.getValue();
+                String key = entry.getKey()
+                switch (mt) {
+                    case Const.MT_FULL:
+                        if (className.equals(key)) {
+                            return key;
+                        }
+                        break;
+                    case Const.MT_REGEX:
+                        if (regMatch(key, className)) {
+                            return key;
+                        }
+                        break;
+                    case Const.MT_WILDCARD:
+                        if (wildcardMatchPro(key, className)) {
+                            return key;
+                        }
+                        break;
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
     }
 }
