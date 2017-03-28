@@ -33,7 +33,11 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
         keepQuiet = false
         //下面的参数设置为true时会输出工程编译耗时信息
         watchTimeConsume = false
-    
+        
+        //下面为对Jar或Aar进行单独修改的配置，执行hibeaverModifyFiles的Gradle任务来对路径所指向的文件进行修改，
+        //产出物在build/HiBeaver目录下
+        modifyTasks = ["${rootDir.absolutePath}/submodule/app/libs/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
+        
         //重头戏是配置下面的参数：modifyMatchMaps
         //基础配置结构形如： ['class':[[:],[:]],'class':[[:],[:]]], 类型是 Map<String, List<Map<String, Object>>>
         modifyMatchMaps = [
@@ -76,9 +80,8 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
                         }]
                 ]
         ]
-        //下面为对Jar或Aar进行单独修改的配置，执行hibeaverModifyFiles的Gradle任务来对路径所指向的文件进行修改，产出物在build/HiBeaver目录下
-        modifyTasks = ["${rootDir.absolutePath}/submodule/app/libs/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
     }
+
 
 本repo项目中还包含一个submodule，里面有本插件的demo，可以使用git submodule来进行初始化，然后在项目根目录加入settings.gradle并编辑（include ':submodule:app'）来包含这个子项目（是一个app demo）。
 
