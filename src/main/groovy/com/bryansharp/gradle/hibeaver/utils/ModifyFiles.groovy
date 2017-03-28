@@ -34,7 +34,8 @@ public class ModifyFiles {
                         modifyAar(targetFile, map);
                         break;
                     case Const.TY_JAR:
-                        modifyJar(targetFile, map, tempDir, false);
+                        File outJar = modifyJar(targetFile, map, tempDir, false);
+                        outJar.renameTo(new File(DataHelper.ext.hiBeaverDir, outJar.getName()))
                         break;
                 }
         })
@@ -127,7 +128,7 @@ public class ModifyFiles {
                 def stream = zipFile.getInputStream(element)
                 byte[] array = IOUtils.toByteArray(stream)
                 Log.info("length is ${array.length}")
-                if (array != null){
+                if (array != null) {
                     outputAarStream.write(array)
                 }
             }
