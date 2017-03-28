@@ -12,7 +12,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 该插件已经上传到Jcenter,可直接引用最新版本如下：
 
-    classpath 'com.bryansharp:hibeaver:1.2.4'
+    classpath 'com.bryansharp:hibeaver:1.2.5'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
@@ -76,6 +76,8 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
                         }]
                 ]
         ]
+        //下面为对Jar或Aar进行单独修改的配置，执行hibeaverModifyFiles的Gradle任务来对路径所指向的文件进行修改，产出物在build/HiBeaver目录下
+        modifyTasks = ["${rootDir.absolutePath}/submodule/app/libs/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
     }
 
 本repo项目中还包含一个submodule，里面有本插件的demo，可以使用git submodule来进行初始化，然后在项目根目录加入settings.gradle并编辑（include ':submodule:app'）来包含这个子项目（是一个app demo）。
@@ -92,7 +94,7 @@ Basically, HiBeaver is an Android plugin for modifying your java byte code durin
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
-    classpath 'com.bryansharp:HiBeaver:1.2.3'
+    classpath 'com.bryansharp:HiBeaver:1.2.5'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
