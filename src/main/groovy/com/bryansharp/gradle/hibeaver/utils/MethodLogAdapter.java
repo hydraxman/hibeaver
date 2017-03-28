@@ -2,17 +2,17 @@ package com.bryansharp.gradle.hibeaver.utils;
 
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * Created by bryansharp on 17/2/15.
  */
 
-public class MethodLogAdapter extends MethodAdapter {
+public class MethodLogAdapter extends MethodVisitor {
 
     public MethodLogAdapter(MethodVisitor mv) {
-        super(mv);
+        super(Opcodes.ASM4, mv);
     }
 
     /**

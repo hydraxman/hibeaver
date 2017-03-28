@@ -8,6 +8,8 @@ public interface Const {
     int MT_FULL = 0;
     int MT_WILDCARD = 1;
     int MT_REGEX = 2;
+    int TY_AAR = 11;
+    int TY_JAR = 12;
     String KEY_CLASSMATCHTYPE="classMatchType";
     String KEY_MODIFYMETHODS="modifyMethods";
     String KEY_METHODNAME="methodName";

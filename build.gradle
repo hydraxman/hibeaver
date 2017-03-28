@@ -19,15 +19,14 @@ dependencies {
 //    compile "com.android.tools.build:transform-api:1.5.0"
     compile "com.android.tools.build:gradle:2.0.0"
     compile "commons-io:commons-io:1.4"
-    compile 'asm:asm:3.3.1'
 }
 repositories {
     mavenCentral()
 }
 group = 'com.bryansharp'
-version = '1.2.4'
+version = '1.2.5'
 uploadArchives {
-//    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can decomment this.
+//    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can uncomment this.
     repositories {
         mavenDeployer {
             repository(url: uri('./repo'))
