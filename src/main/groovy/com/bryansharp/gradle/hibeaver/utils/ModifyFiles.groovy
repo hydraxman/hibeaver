@@ -1,6 +1,5 @@
 package com.bryansharp.gradle.hibeaver.utils
 
-import com.bryansharp.gradle.hibeaver.InjectTransform
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.IOUtils
 
@@ -8,6 +7,8 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 /**
  * Created by bryansharp(bsp0911932@163.com) on 2016/5/10.
@@ -39,7 +40,7 @@ public class ModifyFiles {
         })
     }
 
-    public static JarFile unzipEntryToTemp(JarEntry element, JarFile zipFile) {
+    public static File unzipEntryToTemp(ZipEntry element, ZipFile zipFile) {
         def stream = zipFile.getInputStream(element);
         def array = IOUtils.toByteArray(stream);
         String hex = DigestUtils.md5Hex(element.getName());
@@ -47,14 +48,13 @@ public class ModifyFiles {
         File targetFile = new File(tempDir, hex + ".jar");
         if (targetFile.exists()) {
             targetFile.delete()
-        } else {
-            targetFile.createNewFile()
         }
         new FileOutputStream(targetFile).write(array)
-        return new JarFile(targetFile)
+        return targetFile
     }
 
-    public static File modifyJar(File jarFile, Map<String, Object> modifyMatchMaps, File tempDir, boolean nameHex) {
+    public
+    static File modifyJar(File jarFile, Map<String, Object> modifyMatchMaps, File tempDir, boolean nameHex) {
         /**
          * 读取原jar
          */
@@ -100,29 +100,41 @@ public class ModifyFiles {
         return outputJar;
     }
 
-    public static int modifyAar(File targetFile, Map<String, Object> map) {
+    public static void modifyAar(File targetFile, Map<String, Object> map) {
         final File hiBeaverDir = DataHelper.ext.hiBeaverDir;
         final File tempDir = DataHelper.ext.hiBeaverTempDir;
-        JarFile zipFile = new JarFile(targetFile);
-        Enumeration<JarEntry> entries = zipFile.entries();
+        ZipFile zipFile = new ZipFile(targetFile);
+        Enumeration<ZipEntry> entries = zipFile.entries();
 
         def outputAar = new File(hiBeaverDir, targetFile.name)
         if (outputAar.exists()) {
             outputAar.delete()
         }
 
-        JarOutputStream outputAarStream = new JarOutputStream(new FileOutputStream(outputAar))
+        ZipOutputStream outputAarStream = new ZipOutputStream(new FileOutputStream(outputAar))
         while (entries.hasMoreElements()) {
-            JarEntry element = entries.nextElement();
+            ZipEntry element = entries.nextElement();
             def name = element.getName();
+            ZipEntry zipEntry = new ZipEntry(name);
+
+            outputAarStream.putNextEntry(zipEntry);
+            Log.info("name is ${name}")
             if (name.endsWith(".jar")) {
-                JarFile innerJar = unzipEntryToTemp(element, zipFile);
+                File innerJar = unzipEntryToTemp(element, zipFile);
                 def outJar = modifyJar(innerJar, map, tempDir, true);
                 outputAarStream.write(IOUtils.toByteArray(new FileInputStream(outJar)))
             } else {
-                outputAarStream.write(IOUtils.toByteArray(zipFile.getInputStream(element)))
+                def stream = zipFile.getInputStream(element)
+                byte[] array = IOUtils.toByteArray(stream)
+                Log.info("length is ${array.length}")
+                if (array != null){
+                    outputAarStream.write(array)
+                }
             }
+            outputAarStream.closeEntry();
         }
+        zipFile.close()
+        outputAarStream.close()
     }
 
     public static int isSupportFile(File targetFile) {
