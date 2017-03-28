@@ -45,27 +45,28 @@ public class ModifyClassUtil {
     private
     static byte[] modifyClass(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
+        ClassVisitor adapter = new MethodFilterClassVisitor(classWriter, modifyMatchMaps);
         ClassReader cr = new ClassReader(srcClass);
-        cr.accept(adapter, ClassReader.SKIP_DEBUG);
+        //cr.accept(visitor, ClassReader.SKIP_DEBUG);
+        cr.accept(adapter, 0);
         return classWriter.toByteArray();
     }
 
     private
     static void onlyVisitClassMethod(byte[] srcClass, List<Map<String, Object>> modifyMatchMaps) throws IOException {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        MethodFilterClassAdapter adapter = new MethodFilterClassAdapter(classWriter, modifyMatchMaps);
-        adapter.onlyVisit = true;
+        MethodFilterClassVisitor visitor = new MethodFilterClassVisitor(classWriter, modifyMatchMaps);
+        visitor.onlyVisit = true;
         ClassReader cr = new ClassReader(srcClass);
-        cr.accept(adapter, ClassReader.SKIP_DEBUG);
+        cr.accept(visitor, 0);
     }
 
-    static class MethodFilterClassAdapter extends ClassVisitor implements Opcodes {
+    static class MethodFilterClassVisitor extends ClassVisitor implements Opcodes {
 //        private String className;
         private List<Map<String, Object>> methodMatchMaps;
         public boolean onlyVisit = false;
 
-        public MethodFilterClassAdapter(
+        public MethodFilterClassVisitor(
                 final ClassVisitor cv, List<Map<String, Object>> methodMatchMaps) {
             super(Opcodes.ASM4, cv);
 //            this.className = className;
