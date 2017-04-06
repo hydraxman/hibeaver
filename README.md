@@ -18,6 +18,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 然后在工程的build.gradle里加入如下片段（或通过其他.gradle引入）：
 
+    apply plugin: 'hiBeaver'
     import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
     import org.objectweb.asm.ClassVisitor
     import org.objectweb.asm.MethodVisitor
