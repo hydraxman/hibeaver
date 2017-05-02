@@ -1,6 +1,8 @@
 package com.bryansharp.gradle.hibeaver
 
+import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
 import com.bryansharp.gradle.hibeaver.utils.DataHelper
 import com.bryansharp.gradle.hibeaver.utils.Log
 import com.bryansharp.gradle.hibeaver.utils.ModifyFiles
@@ -36,6 +38,13 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     def static registerTransform(Project project) {
 //        def isApp = project.plugins.hasPlugin("com.android.application")
         BaseExtension android = project.extensions.getByType(BaseExtension)
+        if (android instanceof LibraryExtension){
+            DataHelper.ext.projectType = DataHelper.TYPE_LIB;
+        } else if(android instanceof AppExtension){
+            DataHelper.ext.projectType = DataHelper.TYPE_APP;
+        } else {
+            DataHelper.ext.projectType = -1
+        }
         InjectTransform transform = new InjectTransform()
         android.registerTransform(transform)
     }
