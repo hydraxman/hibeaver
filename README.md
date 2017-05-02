@@ -1,23 +1,25 @@
-#HiBeaver
+# HiBeaver
 
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
 
-###简介
+### 简介
 
 HiBeaver是一个用于进行Android字节码插桩的Gradle插件，可以用来实现Android轻量级AOP设计。结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段，依据使用者的配置，对工程内所包含的Java字节码进行修改，从而支持使用者仅通过Gradle配置对字节码进行代码注入和AOP设计，或对项目依赖的Jar包内的代码增加Hook节点。
 
 Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和装修大坝的可爱小动物。河狸的堤坝虽说不上像三峡那样“高峡出平湖”，却也为自然和生态做出了暖男般的贡献。
 
-###快速上手
+### 快速上手
 
 该插件已经上传到Jcenter,可直接引用最新版本如下：
 
     classpath 'com.bryansharp:hibeaver:1.2.6'
 
+
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
 然后在工程的build.gradle里加入如下片段（或通过其他.gradle引入）：
 
+    apply plugin: 'hiBeaver'
     import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
     import org.objectweb.asm.ClassVisitor
     import org.objectweb.asm.MethodVisitor
@@ -33,7 +35,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
         keepQuiet = false
         //下面的参数设置为true时会输出工程编译耗时信息
         watchTimeConsume = false
-    
+        
         //重头戏是配置下面的参数：modifyMatchMaps
         //基础配置结构形如： ['class':[[:],[:]],'class':[[:],[:]]], 类型是 Map<String, List<Map<String, Object>>>
         modifyMatchMaps = [
@@ -76,13 +78,17 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
                         }]
                 ]
         ]
+        //下面为对Jar或Aar进行单独修改的配置，执行hibeaverModifyFiles的Gradle任务来对路径所指向的文件进行修改，
+        //产出物在build/HiBeaver目录下
+        modifyTasks = ["${rootDir.absolutePath}/submodule/app/libs/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
     }
+
 
 本repo项目中还包含一个submodule，里面有本插件的demo，可以使用git submodule来进行初始化，然后在项目根目录加入settings.gradle并编辑（include ':submodule:app'）来包含这个子项目（是一个app demo）。
 
 玩的愉快！有任何问题和bug请提issue，欢迎参与到本项目的完善中！
 
-##English Version
+## English Version
 
 By applying the regular expression and wildcard features, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
 
