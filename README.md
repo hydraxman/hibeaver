@@ -12,7 +12,8 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 该插件已经上传到Jcenter,可直接引用最新版本如下：
 
-    classpath 'com.bryansharp:hibeaver:1.2.5'
+    classpath 'com.bryansharp:hibeaver:1.2.6'
+
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
@@ -97,7 +98,7 @@ Basically, HiBeaver is an Android plugin for modifying your java byte code durin
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
-    classpath 'com.bryansharp:HiBeaver:1.2.5'
+    classpath 'com.bryansharp:HiBeaver:1.2.6'
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 

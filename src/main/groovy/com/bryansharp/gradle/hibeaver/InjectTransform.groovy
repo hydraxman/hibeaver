@@ -34,6 +34,11 @@ public class InjectTransform extends Transform {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
+        if(DataHelper.ext.projectType == DataHelper.TYPE_APP){
+            return TransformManager.SCOPE_FULL_PROJECT
+        }else if (DataHelper.ext.projectType == DataHelper.TYPE_LIB){
+            return TransformManager.SCOPE_FULL_LIBRARY
+        }
         return TransformManager.SCOPE_FULL_PROJECT
     }
 
