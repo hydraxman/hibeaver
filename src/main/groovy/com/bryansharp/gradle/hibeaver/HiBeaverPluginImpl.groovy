@@ -47,6 +47,8 @@ class HiBeaverPluginImpl implements Plugin<Project> {
         }
         InjectTransform transform = new InjectTransform()
         android.registerTransform(transform)
+        EraserTransform eraserTransform = new EraserTransform()
+        android.registerTransform(eraserTransform)
     }
 
     static void initDir(Project project) {

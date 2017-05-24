@@ -173,9 +173,9 @@ public class InjectTransform extends Transform {
         try {
             String className = Util.path2Classname(classFile.absolutePath.replace(dir.absolutePath + File.separator, ""));
             Map<String, Object> modifyMatchMaps = Util.getHiBeaver().modifyMatchMaps
-            byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
             String key = Util.shouldModifyClass(className)
             if (key != null) {
+                byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
                 byte[] modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
                 if (modifiedClassBytes) {
                     modified = new File(tempDir, className.replace('.', '') + '.class')
