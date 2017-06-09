@@ -26,6 +26,10 @@ class HiBeaverPluginImpl implements Plugin<Project> {
             if (taskMap != null && taskMap.size() > 0) {
                 generateTasks(project, taskMap);
             }
+            Map<String, Map<String, Object>> changeNameMap = project.hiBeaver.changeClassName;
+            if (changeNameMap != null && changeNameMap.size() > 0) {
+                generateChangeNameTasks(project, changeNameMap);
+            }
             if (project.hiBeaver.watchTimeConsume) {
                 Log.info "watchTimeConsume enabled"
                 project.gradle.addListener(new TimeListener())
@@ -65,6 +69,11 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     def static generateTasks(Project project, Map<String, Map<String, Object>> taskMap) {
         project.task("hibeaverModifyFiles") << {
             ModifyFiles.modify(taskMap)
+        }
+    }
+    def static generateChangeNameTasks(Project project, Map<String, Map<String, Object>> changeNameMap) {
+        project.task("hibeaverModifyFilesChangeName") << {
+            ModifyFiles.changeName(changeNameMap)
         }
     }
 }

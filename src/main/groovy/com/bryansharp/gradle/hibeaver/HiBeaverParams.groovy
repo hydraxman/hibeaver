@@ -8,5 +8,6 @@ public class HiBeaverParams {
     boolean showHelp = true
     Map<String, Object> modifyMatchMaps = [:]
     Map<String, Map<String, Object>> modifyTasks = [:]
+    Map<String, Map<String, String>> changeClassName = [:]
 
 }

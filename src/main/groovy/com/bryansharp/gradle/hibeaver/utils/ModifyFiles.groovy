@@ -18,7 +18,8 @@ import java.util.zip.ZipOutputStream
  * introduction:
  */
 public class ModifyFiles {
-
+    public static final int CMD_MODIFY_CLASS_METHOD = 1;
+    public static final int CMD_CHANGE_CLASS_NAME = 2;
 
     public static void modify(Map<String, Map<String, Object>> taskMap) {
         final File tempDir = DataHelper.ext.hiBeaverTempDir;
@@ -31,10 +32,31 @@ public class ModifyFiles {
                 def type = isSupportFile(targetFile)
                 switch (type) {
                     case Const.TY_AAR:
-                        modifyAar(targetFile, map);
+                        processAar(targetFile, map,CMD_MODIFY_CLASS_METHOD);
                         break;
                     case Const.TY_JAR:
-                        File outJar = modifyJar(targetFile, map, tempDir, false);
+                        File outJar = processJar(targetFile, map, tempDir,CMD_MODIFY_CLASS_METHOD, false);
+                        outJar.renameTo(new File(DataHelper.ext.hiBeaverDir, outJar.getName()))
+                        break;
+                }
+        })
+    }
+
+    public static void changeName(Map<String, Map<String, Object>> changeNameMap) {
+        final File tempDir = DataHelper.ext.hiBeaverTempDir;
+        changeNameMap.entrySet().forEach({
+            entry ->
+                String path = entry.getKey();
+                Map<String, String> map = entry.getValue();
+                File targetFile = new File(path)
+                DataHelper.ext.changeNameMap = map
+                def type = isSupportFile(targetFile)
+                switch (type) {
+                    case Const.TY_AAR:
+                        processAar(targetFile, map,CMD_CHANGE_CLASS_NAME);
+                        break;
+                    case Const.TY_JAR:
+                        File outJar = processJar(targetFile, map, tempDir,CMD_CHANGE_CLASS_NAME, false);
                         outJar.renameTo(new File(DataHelper.ext.hiBeaverDir, outJar.getName()))
                         break;
                 }
@@ -55,7 +77,7 @@ public class ModifyFiles {
     }
 
     public
-    static File modifyJar(File jarFile, Map<String, Object> modifyMatchMaps, File tempDir, boolean nameHex) {
+    static File processJar(File jarFile, Map<String, Object> modifyMatchMaps, File tempDir, int command, boolean nameHex) {
         /**
          * 读取原jar
          */
@@ -79,19 +101,28 @@ public class ModifyFiles {
 
             jarOutputStream.putNextEntry(zipEntry);
 
-            byte[] modifiedClassBytes = null;
-            byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
+            byte[] modifiedBytes = null;
+            byte[] sourceBytes = IOUtils.toByteArray(inputStream);
             if (entryName.endsWith(".class")) {
-                className = Util.path2Classname(entryName)
-                String key = Util.shouldModifyClass(className)
-                if (modifyMatchMaps != null && key != null) {
-                    modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
+                switch (command) {
+                    case CMD_MODIFY_CLASS_METHOD:
+                        className = Util.path2Classname(entryName)
+                        String key = Util.shouldModifyClass(className)
+                        if (modifyMatchMaps != null && key != null) {
+                            modifiedBytes = ModifyClassUtil.modifyClasses(className, sourceBytes, modifyMatchMaps.get(key));
+                        }
+                        break;
+                    case CMD_CHANGE_CLASS_NAME:
+                        className = Util.path2Classname(entryName)
+                        Map<String, String> classNameChangeMap = DataHelper.ext.changeNameMap
+                        modifiedBytes = ModifyClassUtil.changeClassName(className, sourceBytes, classNameChangeMap);
+                        break;
                 }
             }
-            if (modifiedClassBytes == null) {
-                jarOutputStream.write(sourceClassBytes);
+            if (modifiedBytes == null) {
+                jarOutputStream.write(sourceBytes);
             } else {
-                jarOutputStream.write(modifiedClassBytes);
+                jarOutputStream.write(modifiedBytes);
             }
             jarOutputStream.closeEntry();
         }
@@ -101,7 +132,7 @@ public class ModifyFiles {
         return outputJar;
     }
 
-    public static void modifyAar(File targetFile, Map<String, Object> map) {
+    public static void processAar(File targetFile, Map<String, Object> map,int command) {
         final File hiBeaverDir = DataHelper.ext.hiBeaverDir;
         final File tempDir = DataHelper.ext.hiBeaverTempDir;
         ZipFile zipFile = new ZipFile(targetFile);
@@ -122,7 +153,7 @@ public class ModifyFiles {
             Log.info("name is ${name}")
             if (name.endsWith(".jar")) {
                 File innerJar = unzipEntryToTemp(element, zipFile);
-                def outJar = modifyJar(innerJar, map, tempDir, true);
+                def outJar = processJar(innerJar, map, tempDir,command, true);
                 outputAarStream.write(IOUtils.toByteArray(new FileInputStream(outJar)))
             } else {
                 def stream = zipFile.getInputStream(element)

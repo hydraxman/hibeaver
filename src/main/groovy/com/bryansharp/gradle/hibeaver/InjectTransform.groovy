@@ -161,7 +161,7 @@ public class InjectTransform extends Transform {
     public static File modifyJarFile(File jarFile, File tempDir) {
         if (jarFile) {
             Map<String, Object> modifyMatchMaps = Util.getHiBeaver().modifyMatchMaps
-            return ModifyFiles.modifyJar(jarFile, modifyMatchMaps, tempDir, true)
+            return ModifyFiles.processJar(jarFile, modifyMatchMaps, tempDir, true)
 
         }
         return null;
