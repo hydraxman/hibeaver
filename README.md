@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/hibeaver/Lobby.svg)](https://gitter.im/hibeaver/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 # HiBeaver
 
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
