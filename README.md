@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/BryanSharp/hibeaver.svg?branch=master)](https://travis-ci.org/BryanSharp/hibeaver) [![Gitter](https://badges.gitter.im/hibeaver/Lobby.svg)](https://gitter.im/hibeaver/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Build Status](https://travis-ci.org/BryanSharp/hibeaver.svg?branch=master)](https://travis-ci.org/BryanSharp/hibeaver)[ ![Download](https://api.bintray.com/packages/bsp0911932/maven/HiBeaver/images/download.svg) ](https://bintray.com/bsp0911932/maven/HiBeaver/_latestVersion) [![Gitter](https://badges.gitter.im/hibeaver/Lobby.svg)](https://gitter.im/hibeaver/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # HiBeaver
 
