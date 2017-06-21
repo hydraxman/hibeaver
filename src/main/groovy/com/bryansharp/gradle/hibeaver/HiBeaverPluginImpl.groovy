@@ -16,7 +16,22 @@ class HiBeaverPluginImpl implements Plugin<Project> {
         println ":applied HiBeaver"
         project.extensions.create('hiBeaver', HiBeaverParams)
         Util.setProject(project)
-        registerTransform(project)
+        try {
+            BaseExtension android = project.extensions.getByType(BaseExtension)
+            if (android instanceof LibraryExtension) {
+                DataHelper.ext.projectType = DataHelper.TYPE_LIB;
+            } else if (android instanceof AppExtension) {
+                DataHelper.ext.projectType = DataHelper.TYPE_APP;
+            } else {
+                DataHelper.ext.projectType = -1
+            }
+        } catch (Exception e) {
+            DataHelper.ext.projectType = -1
+        }
+
+        if (DataHelper.ext.projectType != -1) {
+            registerTransform(android)
+        }
         initDir(project);
         project.afterEvaluate {
             Log.setQuiet(project.hiBeaver.keepQuiet);
@@ -35,21 +50,15 @@ class HiBeaverPluginImpl implements Plugin<Project> {
         }
     }
 
-    def static registerTransform(Project project) {
-//        def isApp = project.plugins.hasPlugin("com.android.application")
-        BaseExtension android = project.extensions.getByType(BaseExtension)
-        if (android instanceof LibraryExtension){
-            DataHelper.ext.projectType = DataHelper.TYPE_LIB;
-        } else if(android instanceof AppExtension){
-            DataHelper.ext.projectType = DataHelper.TYPE_APP;
-        } else {
-            DataHelper.ext.projectType = -1
-        }
+    def static registerTransform(BaseExtension android) {
         InjectTransform transform = new InjectTransform()
         android.registerTransform(transform)
     }
 
     static void initDir(Project project) {
+        if (!project.buildDir.exists()) {
+            project.buildDir.mkdirs()
+        }
         File hiBeaverDir = new File(project.buildDir, "HiBeaver")
         if (!hiBeaverDir.exists()) {
             hiBeaverDir.mkdir()
