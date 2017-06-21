@@ -25,12 +25,11 @@ class HiBeaverPluginImpl implements Plugin<Project> {
             } else {
                 DataHelper.ext.projectType = -1
             }
+            if (DataHelper.ext.projectType != -1) {
+                registerTransform(android)
+            }
         } catch (Exception e) {
             DataHelper.ext.projectType = -1
-        }
-
-        if (DataHelper.ext.projectType != -1) {
-            registerTransform(android)
         }
         initDir(project);
         project.afterEvaluate {
