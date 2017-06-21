@@ -17,16 +17,18 @@ class HiBeaverPluginImpl implements Plugin<Project> {
         project.extensions.create('hiBeaver', HiBeaverParams)
         Util.setProject(project)
         try {
-            BaseExtension android = project.extensions.getByType(BaseExtension)
-            if (android instanceof LibraryExtension) {
-                DataHelper.ext.projectType = DataHelper.TYPE_LIB;
-            } else if (android instanceof AppExtension) {
-                DataHelper.ext.projectType = DataHelper.TYPE_APP;
-            } else {
-                DataHelper.ext.projectType = -1
-            }
-            if (DataHelper.ext.projectType != -1) {
-                registerTransform(android)
+            if(Class.forName("com.android.build.gradle.BaseExtension")){
+                BaseExtension android = project.extensions.getByType(BaseExtension)
+                if (android instanceof LibraryExtension) {
+                    DataHelper.ext.projectType = DataHelper.TYPE_LIB;
+                } else if (android instanceof AppExtension) {
+                    DataHelper.ext.projectType = DataHelper.TYPE_APP;
+                } else {
+                    DataHelper.ext.projectType = -1
+                }
+                if (DataHelper.ext.projectType != -1) {
+                    registerTransform(android)
+                }
             }
         } catch (Exception e) {
             DataHelper.ext.projectType = -1
