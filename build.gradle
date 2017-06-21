@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 group = 'com.bryansharp'
-version = '1.2.6'
+version = '1.2.7'
 uploadArchives {
 //    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can uncomment this.
     repositories {
@@ -75,10 +75,14 @@ artifacts {
     archives sourcesJar
 }
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+boolean isHasFile = false
+if (project.rootProject.findProject('local.properties') != null){
+    isHasFile = true
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = isHasFile ? properties.getProperty("bintray.user") : System.getenv("bintray.user")
+    key = isHasFile ? properties.getProperty("bintray.apikey") : System.getenv("bintray.apikey")
     configurations = ['archives']
     pkg {
         repo = "maven"
