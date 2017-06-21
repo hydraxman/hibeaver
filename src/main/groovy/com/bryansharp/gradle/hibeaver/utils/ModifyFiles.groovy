@@ -119,7 +119,6 @@ public class ModifyFiles {
             ZipEntry zipEntry = new ZipEntry(name);
 
             outputAarStream.putNextEntry(zipEntry);
-            Log.info("name is ${name}")
             if (name.endsWith(".jar")) {
                 File innerJar = unzipEntryToTemp(element, zipFile);
                 def outJar = modifyJar(innerJar, map, tempDir, true);
@@ -127,7 +126,6 @@ public class ModifyFiles {
             } else {
                 def stream = zipFile.getInputStream(element)
                 byte[] array = IOUtils.toByteArray(stream)
-                Log.info("length is ${array.length}")
                 if (array != null) {
                     outputAarStream.write(array)
                 }
