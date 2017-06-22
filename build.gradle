@@ -76,11 +76,13 @@ artifacts {
 }
 Properties properties = new Properties()
 boolean isHasFile = false
-if (project.rootProject.findProject('local.properties') != null){
+if (project.rootProject.file('local.properties') != null){
     isHasFile = true
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    println "1 hasfile:$isHasFile"
 }
 bintray {
+    println "hasfile:$isHasFile"
     user = isHasFile ? properties.getProperty("bintray.user") : System.getenv("bintray.user")
     key = isHasFile ? properties.getProperty("bintray.apikey") : System.getenv("bintray.apikey")
     configurations = ['archives']
