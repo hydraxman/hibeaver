@@ -16,7 +16,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
     classpath 'com.bryansharp:hibeaver:1.2.7'
 
-在1.2.7及以上的版本中，hibeaverModifyFiles任务不再依赖Android的gradle插件，也就是说只有你有gradle和Java运行环境，建一个build.gradle就可以指定Jar/Aar文件进行修改了。详见testJarModify目录下的示例。
+在1.2.7及以上的版本中，hibeaverModifyFiles任务不再依赖Android的gradle插件，也就是说只要你有gradle和Java运行环境，建一个build.gradle就可以指定Jar/Aar文件进行修改了。详见testJarModify目录下的示例。
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
