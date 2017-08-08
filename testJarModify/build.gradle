@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.bryansharp:hibeaver:1.2.7-SNAPSHOT'//this is the local version
+        classpath 'com.bryansharp:hibeaver:1.2.8-SNAPSHOT'//this is the local version
     }
 }
 apply plugin: 'hiBeaver'
@@ -79,6 +79,8 @@ hiBeaver {
                             return adapter;
                     }]
             ]
+            ,
+            'addClassFrom:/Users/bushaopeng/Desktop/test.jar':'test.test.Test'
     ]
-    modifyTasks = ["${rootDir.absolutePath}/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
+    modifyTasks = ["${rootDir.absolutePath}/testJarModify/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
 }

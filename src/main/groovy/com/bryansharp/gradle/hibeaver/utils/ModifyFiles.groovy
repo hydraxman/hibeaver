@@ -66,6 +66,7 @@ public class ModifyFiles {
             hexName = DigestUtils.md5Hex(jarFile.absolutePath).substring(0, 8);
         }
         def outputJar = new File(tempDir, hexName + jarFile.name)
+
         JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(outputJar));
         Enumeration enumeration = file.entries();
         while (enumeration.hasMoreElements()) {
@@ -94,6 +95,38 @@ public class ModifyFiles {
                 jarOutputStream.write(modifiedClassBytes);
             }
             jarOutputStream.closeEntry();
+        }
+        Map<String, String> addMap = Util.getAddClass()
+        if (addMap.size() > 0) {
+            try {
+                for (Map.Entry<String, String> entry : addMap.entrySet()) {
+                    String desc = entry.getValue()
+                    def classes = Arrays.asList(desc.split(","))
+                    println classes
+                    String addJarPath = entry.getKey().split(":")[1]
+                    file = new JarFile(new File(addJarPath))
+                    enumeration = file.entries();
+                    while (enumeration.hasMoreElements()) {
+                        JarEntry jarEntry = (JarEntry) enumeration.nextElement();
+                        InputStream inputStream = file.getInputStream(jarEntry);
+                        String entryName = jarEntry.getName();
+                        if (entryName.endsWith(".class")) {
+                            String className = Util.path2Classname(entryName)
+                            println 'add has class:'+className
+                            if (classes.contains(className)) {
+                                println 'adding class:'+className
+                                byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
+                                ZipEntry zipEntry = new ZipEntry(entryName);
+                                jarOutputStream.putNextEntry(zipEntry);
+                                jarOutputStream.write(sourceClassBytes);
+                                jarOutputStream.closeEntry();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace()
+            }
         }
 //            Log.info("${hexName} is modified");
         jarOutputStream.close();

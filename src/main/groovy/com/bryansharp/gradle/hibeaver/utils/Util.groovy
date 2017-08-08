@@ -14,7 +14,12 @@ import java.util.regex.Pattern
  * introduction:
  */
 public class Util {
+    static Map<String, Integer> targetClasses = [:];
 
+    static Map<String, String> getAddClass() {
+        return addClass
+    }
+    static Map<String, String> addClass = [:];
 
     private static Project project;
 
@@ -44,10 +49,16 @@ public class Util {
                     int type;
                     if (value instanceof Map) {
                         type = typeString2Int(value.get(Const.KEY_CLASSMATCHTYPE));
+                        targetClasses.put(entry.getKey(), type)
+                    } else if (value instanceof String) {
+                        println entry.getKey() + 'add class from ' + value
+                        if (entry.getKey().startsWith("addClassFrom:")) {
+                            addClass.put(entry.getKey().trim(), value.trim())
+                        }
                     } else {
                         type = getMatchTypeByValue(entry.getKey());
+                        targetClasses.put(entry.getKey(), type)
                     }
-                    targetClasses.put(entry.getKey(), type)
                 }
             }
         }
@@ -238,8 +249,6 @@ public class Util {
     public static String className2Path(String classname) {
         return classname.replace('.', '/');
     }
-
-    static Map<String, Integer> targetClasses = [:];
 
     public static boolean isTargetClassesNotEmpty() {
         targetClasses != null && targetClasses.size() > 0
