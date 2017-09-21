@@ -82,7 +82,7 @@ public class ModifyFiles {
             byte[] modifiedClassBytes = null;
             byte[] sourceClassBytes = IOUtils.toByteArray(inputStream);
             if (entryName.endsWith(".class")) {
-                className = Util.path2Classname(entryName)
+                className =  entryName.replace("/", ".").replace(".class", "")
                 String key = Util.shouldModifyClass(className)
                 if (modifyMatchMaps != null && key != null) {
                     modifiedClassBytes = ModifyClassUtil.modifyClasses(className, sourceClassBytes, modifyMatchMaps.get(key));
