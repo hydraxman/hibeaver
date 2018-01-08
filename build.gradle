@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 group = 'com.bryansharp'
-version = '1.2.7'
+version = '1.2.8'
 uploadArchives {
 //    version = version + '-SNAPSHOT'//if you are testing the demo I provide locally, you can uncomment this.
     repositories {
