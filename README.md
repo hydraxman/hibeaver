@@ -9,6 +9,7 @@
 HiBeaver是一个用于进行Java字节码插桩的Gradle插件，可以用来:
 
 1.修改Jar文件内部的代码实现，注入逻辑。
+
 2.实现Android轻量级AOP设计。
 
 结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段，依据使用者的配置，对工程内所包含的Java字节码进行修改，从而支持使用者仅通过Gradle配置对字节码进行代码注入和AOP设计，或对项目依赖的Jar包内的代码增加Hook节点。
