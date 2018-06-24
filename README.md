@@ -10,11 +10,11 @@ HiBeaver是一个用于进行Java字节码插桩的Gradle插件，可以用来:
 
 1.修改Jar文件内部的代码实现，注入逻辑。
 
-2.实现Android轻量级AOP设计。
+2.实现Java轻量级AOP设计，支持Android Gradle Plugin。
 
 结合强大的Java ASM字节码修改工具和Gradle Transform API，HiBeaver可以实现在Android应用编译阶段，依据使用者的配置，对工程内所包含的Java字节码进行修改，从而支持使用者仅通过Gradle配置对字节码进行代码注入和AOP设计，或对项目依赖的Jar包内的代码增加Hook节点。
 
-从1.2.7版本开始，HiBeaver不在依赖于Android编译插件，可以在Gradle环境下独立运行，随心所欲地修改Jar/Aar文件内的代码逻辑。
+从1.2.7版本开始，HiBeaver不再依赖于Android编译插件，可以在Gradle环境下独立运行，随心所欲地修改Jar/Aar文件内的代码逻辑。
 
 Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和装修大坝的可爱小动物。河狸的堤坝虽说不上像三峡那样“高峡出平湖”，却也为自然和生态做出了暖男般的贡献。
 
