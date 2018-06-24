@@ -101,11 +101,11 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 ## English Version
 
-By applying the regular expression and wildcard features, HiBeaver now has been upgraded to an Android lightweight AOP design tool.
+By applying the regular expression and wildcard features, HiBeaver now has been upgraded to a Java lightweight AOP design tool.
 
 Beaver means 河狸 in Chinese, cute animals always busy in building their cute river dam.
 
-Basically, HiBeaver is an Android plugin for modifying your java byte code during the building of your package.
+Basically, HiBeaver is a Gradle plugin for modifying your java byte code.
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
