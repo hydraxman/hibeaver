@@ -8,7 +8,7 @@
 
 HiBeaver是一个用于进行Java字节码插桩的Gradle插件，可以用来:
 
-1.修改Jar文件内部的代码实现，注入逻辑。
+1.修改Jar文件内部的代码实现，注入逻辑（同时还支持对Android的aar文件进行修改）。
 
 2.实现Java轻量级AOP设计，支持Android Gradle Plugin。
 
