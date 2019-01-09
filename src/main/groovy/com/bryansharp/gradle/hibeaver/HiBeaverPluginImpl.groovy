@@ -73,7 +73,7 @@ class HiBeaverPluginImpl implements Plugin<Project> {
     }
 
     def static generateTasks(Project project, Map<String, Map<String, Object>> taskMap) {
-        project.task("hibeaverModifyFiles") << {
+        project.task("hibeaverModifyFiles").doLast {
             ModifyFiles.modify(taskMap)
         }
     }
