@@ -99,6 +99,8 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 玩的愉快！有任何问题和bug请提issue，欢迎参与到本项目的完善中！
 
+![Rose](https://github.com/BryanSharp/hibeaver/blob/master/applause.png?raw=true)
+
 ## English Version
 
 By applying the regular expression and wildcard features, HiBeaver now has been upgraded to a Java lightweight AOP design tool.
