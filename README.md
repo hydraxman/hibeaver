@@ -2,6 +2,8 @@
 
 # HiBeaver
 
+[Java字节码修改神器HiBeaver：黑掉你的SDK](https://segmentfault.com/a/1190000008491823)
+
 ![cute animals always busy in building their river dam](https://github.com/BryanSharp/hibeaver/blob/master/beaver.jpeg?raw=true)
 
 ### 简介
