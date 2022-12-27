@@ -112,7 +112,7 @@ Basically, HiBeaver is a Gradle plugin for modifying your java byte code.
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
-'''groovy
+```groovy
     classpath 'com.bryansharp:HiBeaver:1.2.7'
 ```
 
