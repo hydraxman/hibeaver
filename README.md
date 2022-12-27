@@ -32,6 +32,7 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
 
 然后在工程的build.gradle里加入如下片段（或通过其他.gradle引入）：
 
+```groovy
     apply plugin: 'hiBeaver'
     import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
     import org.objectweb.asm.ClassVisitor
@@ -95,13 +96,11 @@ Beaver，即河狸，是一种日日忙碌于在自己栖息河流上修建和�
         //产出物在build/HiBeaver目录下
         modifyTasks = ["${rootDir.absolutePath}/submodule/app/libs/MiPush_SDK_Client_3_2_2.jar": modifyMatchMaps]
     }
-
+```
 
 本repo项目中还包含一个submodule，里面有本插件的demo，可以使用git submodule来进行初始化，然后在项目根目录加入settings.gradle并编辑（include ':submodule:app'）来包含这个子项目（是一个app demo）。
 
 玩的愉快！有任何问题和bug请提issue，欢迎参与到本项目的完善中！
-
-![Rose](https://github.com/BryanSharp/hibeaver/blob/master/applause.png?raw=true)
 
 ## English Version
 
@@ -113,12 +112,15 @@ Basically, HiBeaver is a Gradle plugin for modifying your java byte code.
 
 This plugin has been uploaded to jcenter. You can use this by adding the following code to your buildScripts:
 
+'''groovy
     classpath 'com.bryansharp:HiBeaver:1.2.7'
+```
 
 [Link to Jcenter](https://bintray.com/bsp0911932/maven/HiBeaver)
 
 and then add this to you app build scripts:
 
+```groovy
     import com.bryansharp.gradle.hibeaver.utils.MethodLogAdapter
     import org.objectweb.asm.ClassVisitor
     import org.objectweb.asm.MethodVisitor
@@ -202,6 +204,7 @@ and then add this to you app build scripts:
                 ]
         ]
     }
+```
 
 You can also see the content above in the build log outputs.
 
